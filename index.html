@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>HakoDB — Embedded NoSQL that syncs</title>
-  <meta name="description" content="HakoDB is an embedded, Firestore-style document database in Rust. Zero-deploy like SQLite, with LAN mesh and cloud sync, a flat C ABI, and SDKs for Go, TypeScript, Pascal and Tauri.">
+  <meta name="description" content="HakoDB is an embedded document database with native vector search and multi-plane sync, written in Rust. Zero-deploy like SQLite, with LAN mesh and cloud sync, a flat C ABI, and SDKs for Go, TypeScript, Pascal and Tauri.">
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -36,7 +36,7 @@
     <section class="hero wrap">
       <p class="badge"><span class="dot" aria-hidden="true"></span>v0.12.3 · production-candidate · MIT</p>
       <h1>Embedded NoSQL<br>that <em>syncs</em>.</h1>
-      <p class="lede">HakoDB is a Firestore-style document database in Rust. It runs fully in-process like SQLite — no server, no daemon — and replicates over LAN mesh or a cloud hub when you need it.</p>
+      <p class="lede">HakoDB is an embedded document database with native vector search and multi-plane sync, written in Rust. It runs fully in-process like SQLite — no server, no daemon — and replicates over LAN mesh or a cloud hub when you need it.</p>
       <div class="cta-row">
         <a class="btn btn-primary" href="#quickstart">Get started</a>
         <a class="btn btn-ghost" href="https://github.com/hakodb/hakodb">Read the docs</a>
@@ -70,7 +70,7 @@ let found = db.query(
         </article>
         <article class="card">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5M8 11h6M11 8v6"/></svg>
-          <h3>Firestore-style queries</h3>
+          <h3>Fluent document queries</h3>
           <p>Filters, ordering, cursors, projections, count/sum/avg — plus composite, full-text and secondary indexes built in the background.</p>
         </article>
         <article class="card">
