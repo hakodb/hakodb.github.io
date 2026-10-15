@@ -43,3 +43,16 @@
 
 - [Real-product recipes](recipes.md)
 - [Operations](operations.md)
+
+# Backend (hakobackend)
+
+- [Backend overview](backend-overview.md)
+- [Backend quickstart](backend-quickstart.md)
+- [Backend configuration](backend-config.md)
+- [Backend path aliases](backend-alias.md)
+- [Backend indexes](backend-indexes.md)
+- [Backend policy](backend-policy.md)
+- [Backend auth](backend-auth.md)
+- [Backend drivers](backend-drivers.md)
+- [Backend realtime, files, TTL](backend-realtime-files.md)
+- [Backend deploy](backend-deploy.md)
