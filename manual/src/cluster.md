@@ -52,6 +52,14 @@ Every cluster member is a full `Hako` instance, so each box joins the LAN/cloud 
 
 Hard limit, state it plainly: **each box keeps its own writer** (promote is per-cluster; there is no cross-box election). Concurrent writes to the same document on two boxes converge by last-write-wins — one side wins silently. This pattern fits write-partitioned workloads (edge regions, tenant affinity), never shared counters or ledgers. If two boxes must coordinate one document, that document belongs on one box (or behind one backend).
 
+## Tailer variant: N+1 with a dedicated bridge (issue #23)
+
+When the operator wants the bridge managed (instead of hand-rolled per-box mesh/cloud), the cluster derives one extra member:
+
+- Config declares N serving paths plus **one** of `tailer_mesh {name, room_key, port}` (needs cargo feature `tailer-mesh`) or `tailer_cloud {client_id, room_name, room_key, auth_token, server_url}` (needs `tailer-cloud`). Both set, or knob set without its feature, or any tailer off-unix: fail-closed boot error.
+- The tailer gets a derived sibling dir (`<first-dir>.tailer`), meshes locally like every member, then bridges outward. It never serves fan-out reads, is never promotable, and is always read-only.
+- Same LWW-across-boxes rule as the manual pattern; same single-writer-per-box. C ABI: `tailer_mesh` / `tailer_cloud` objects in the open config JSON (malformed shapes fail parse).
+
 ## Common mistakes
 
 - **Clustering across machines.** Instances must share a box (unix sockets). Across boxes, run one backend per box with [cloud sync](sync-cloud.md) between them.
