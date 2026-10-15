@@ -1,0 +1,56 @@
+name: docs
+
+# mdBook manual -> https://hakodb.github.io/docs/ plus the static landing
+# page, deployed as one Pages artifact. mdBook source lives in manual/;
+# built output is staged under _site/docs (never committed).
+on:
+  push:
+    branches: [main]
+    paths:
+      - "manual/**"
+      - "index.html"
+      - "styles.css"
+      - "assets/**"
+      - "llms.txt"
+      - ".github/workflows/docs.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install mdBook
+        run: cargo install mdbook --locked
+      - name: Build manual
+        run: |
+          cd manual
+          mdbook build
+      - name: Assemble site
+        run: |
+          mkdir -p _site/docs
+          cp -r manual/book/. _site/docs/
+          cp index.html styles.css llms.txt _site/
+          cp -r assets _site/
+          touch _site/.nojekyll
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,17 @@
+# HakoDB Docs — llms.txt
+
+> HakoDB: embedded document database (Rust) with vector + graph search and multi-plane sync. These notes map the manual at https://hakodb.github.io/docs/ for AI assistants. Code identifiers are exact; verify signatures against hakodb source or docs.rs before generating calls.
+
+- Start here: intro, concepts (collections, typed values, in-process model), choosing a mode (embedded vs net/cloud/socket sync).
+  https://hakodb.github.io/docs/intro.html https://hakodb.github.io/docs/concepts.html https://hakodb.github.io/docs/choosing-mode.html
+- Core: CRUD (put/get/patch/delete/subdocuments), queries (filters, order, cursors, aggregates, planner), indexes (secondary/composite/FTS, background readiness).
+  https://hakodb.github.io/docs/crud.html https://hakodb.github.io/docs/queries.html https://hakodb.github.io/docs/indexes.html
+- Vector KNN: create_vector_index + find_near, LE-f32 fields, cosine/L2, index-before-write, one-model rule, graphs rebuild locally.
+  https://hakodb.github.io/docs/vector.html
+- Graph: Reference edges, create_traverse_index + find_paths (BFS, depth 1..=32), create_edge_index + via_edge/weight_field Dijkstra, untracked-incoming errors loudly.
+  https://hakodb.github.io/docs/graph.html
+- Writes: write_batch (atomic), serializable transactions (conflict retry), watch_collection streams, durability modes, encryption, compression, backup/recovery.
+  https://hakodb.github.io/docs/transactions.html https://hakodb.github.io/docs/watch.html https://hakodb.github.io/docs/durability.html https://hakodb.github.io/docs/backup-recovery.html
+- Errors: HakoError variants (Io, LockPoisoned, StorageError, QueryError, IndexError, Corrupt, InvalidInput); fail-closed rules (loud over empty, no silent clamping).
+  https://hakodb.github.io/docs/errors.html
+- Source of truth for API: Rust engine `Hako` (97 pub fns), C ABI `hakodb.h` (179 fns), per-repo SDK READMEs under https://github.com/hakodb.
