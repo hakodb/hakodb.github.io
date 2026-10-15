@@ -38,6 +38,20 @@ Note the layering: this registry is for embedding the cluster as a library. `hak
 
 `hakobackend` embeds this pattern for multi-instance deployments: several backend processes hold identical data via socket sync while a balancer spreads HTTP load. If you run one backend process, you don't need the cluster — one `hakodb` with socket sync (or nothing) is enough.
 
+## Multi-box composition (no new knobs)
+
+The cluster has no cross-machine sync knobs — `ClusterConfig` carries durability, group-commit, stagger, lag guard, and `sock_dir` only, by design. Multi-box replication composes existing pieces instead of adding transport:
+
+```
+box A: cluster (writer + replicas, socket_sync)
+box B: cluster (writer + replicas, socket_sync)
+between boxes: net-sync mesh room OR cloud-sync hub, at hakodb level
+```
+
+Every cluster member is a full `Hako` instance, so each box joins the LAN/cloud plane like any single instance would. Within a box: socket snapshot + 500ms tail. Between boxes: mesh/cloud cadence. Echo interplay is already handled — replicated ingest inserts echo entries, so ops arriving from LAN are not rebroadcast back to LAN via the socket tailer, and vice versa.
+
+Hard limit, state it plainly: **each box keeps its own writer** (promote is per-cluster; there is no cross-box election). Concurrent writes to the same document on two boxes converge by last-write-wins — one side wins silently. This pattern fits write-partitioned workloads (edge regions, tenant affinity), never shared counters or ledgers. If two boxes must coordinate one document, that document belongs on one box (or behind one backend).
+
 ## Common mistakes
 
 - **Clustering across machines.** Instances must share a box (unix sockets). Across boxes, run one backend per box with [cloud sync](sync-cloud.md) between them.
