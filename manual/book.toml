@@ -1,0 +1,10 @@
+[book]
+title = "HakoDB Docs"
+authors = ["HakoDB"]
+language = "en"
+src = "src"
+
+[output.html]
+site-url = "/docs/"
+git-repository-url = "https://github.com/hakodb/hakodb.github.io"
+edit-url-template = "https://github.com/hakodb/hakodb.github.io/edit/main/manual/{path}"
