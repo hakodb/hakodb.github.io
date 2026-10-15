@@ -16,7 +16,7 @@
   https://hakodb.github.io/docs/errors.html
 - Sync: rooms, versions/deltas, LWW, echo suppression, withheld/excluded/local-only, same-minor lockstep; mesh guide (mDNS, rooms, troubleshooting), cloud guide (server/client, VersionPing, auth), socket plane (unix, balancer), encryption posture (wire vs at-rest, caps rule, operating).
   https://hakodb.github.io/docs/sync-concepts.html https://hakodb.github.io/docs/sync-mesh.html https://hakodb.github.io/docs/sync-cloud.html https://hakodb.github.io/docs/sync-socket.html https://hakodb.github.io/docs/sync-encryption.html
-- Cluster: hakocluster dispatcher (reads fan out, writes route, promote/epoch, health), socket-sync companion, hakobackend relevance.
+- Cluster: hakocluster dispatcher (reads fan out, writes route, promote/epoch, health), multidb Databases registry (exact-name, per-db mesh dirs, FFI), Hako-only members, socket-sync companion, hakobackend relevance.
   https://hakodb.github.io/docs/cluster.html
 - SDKs: C ABI (179 fns, handles, ownership, status codes), JS/TS (@hakodb/client: open, collection/doc, where/orderBy, onSnapshot), Go (cgo, explicit Free), Pascal (THako/THKDocument, try/finally), Tauri (gateway + @hakodb/tauri modular API), CLI (get/set/query/traverse/vector/serve), HTTP backend (hakobackend wire + @hakodb/backend client methods).
   https://hakodb.github.io/docs/sdk-c-abi.html https://hakodb.github.io/docs/sdk-js.html https://hakodb.github.io/docs/sdk-go.html https://hakodb.github.io/docs/sdk-pascal.html https://hakodb.github.io/docs/sdk-tauri.html https://hakodb.github.io/docs/sdk-cli.html https://hakodb.github.io/docs/sdk-backend.html

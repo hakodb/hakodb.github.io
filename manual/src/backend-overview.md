@@ -5,8 +5,10 @@
 ```
 clients (browser / phone / CLI / SDK)
   → HTTP/WS (`HTTP_CONTRACT`) → auth chain → policy file → rate limits
-  → driver trait → hako | sqlite | postgres | mysql | rethinkdb (…)
+  → driver trait → hako | hakocluster | sqlite | postgres | mysql | rethinkdb
 ```
+
+The driver trait (`hakobackend_core::Database`: CRUD, identical list semantics, atomic transactions, watch channel) is the only thing the core knows about storage. `hako` is the default embedded driver; **`hakocluster` is a first-class driver too** — same trait, N Hako dirs behind one handle, capabilities delegated to its writer (see [Backend drivers](backend-drivers.md) and [Cluster](cluster.md)). Switching drivers is two config lines + `/api/admin/reload`, no rebuild.
 
 Design rules that never bend:
 
