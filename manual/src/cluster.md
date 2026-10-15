@@ -2,7 +2,7 @@
 
 `hakocluster` (`hakodb/hakocluster`, currently `0.3.11`) is an in-process dispatcher over N `hakodb` instances on one machine: reads fan out, writes route to one writer, and `socket_sync` keeps replicas identical. It is the backend-side companion to [socket sync](sync-socket.md): the dispatcher is the single writer the socket plane assumes.
 
-```rust
+```rust,ignore
 let cluster = Cluster::open(&["./node-a", "./node-b", "./node-c"])?;
 // reads spread across instances; writes go to the current writer
 cluster.put("users", "1", &doc)?;

@@ -1,6 +1,6 @@
 # Vector search
 
-```rust
+```rust,ignore
 use hakodb::index::vector::Metric;
 
 db.create_vector_index("articles", "embedding", 384, Metric::Cosine)?;

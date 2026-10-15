@@ -2,7 +2,7 @@
 
 All three are `HakoConfig` fields, set before `open` (encryption key cannot be added to an existing database afterwards — the choice is baked into the files).
 
-```rust
+```rust,ignore
 use hakodb::config::{DurabilityMode, HakoConfig};
 
 let mut cfg = HakoConfig::default();

@@ -2,7 +2,7 @@
 
 Two halves: `hakotauri` (`0.4.10`, Rust gateway crate) exposes the engine as binary Tauri commands; `@hakodb/tauri` (`0.3.5`, `hakodb/hakotaurits`) calls them over `invoke` with MessagePack payloads and `onSnapshot` listeners.
 
-```rust
+```rust,ignore
 // src-tauri: register the gateway (see hakotauri README for the full setup)
 tauri::Builder::default()
     .invoke_handler(/* hako commands */)

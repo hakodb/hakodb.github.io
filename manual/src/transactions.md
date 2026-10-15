@@ -2,7 +2,7 @@
 
 Two levels, pick by what can go wrong:
 
-```rust
+```rust,ignore
 use hakodb::engine::BatchMutation;
 
 // Level 1: atomic batch — all mutations commit together, no isolation checks

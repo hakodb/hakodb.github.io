@@ -2,7 +2,7 @@
 
 Feature: `net-sync`. Peer-to-peer replication over TCP on the local network, with mDNS discovery. No server, no accounts — whoever holds the room key syncs.
 
-```rust
+```rust,ignore
 use hakodb::net_sync::NetSyncer;
 use std::sync::Arc;
 
