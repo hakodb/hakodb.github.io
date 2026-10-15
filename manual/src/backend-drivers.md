@@ -5,6 +5,7 @@ Every database is an addon behind `hakobackend_core::Database`: `insert` (fills 
 | Driver | Crate | Watch | Transactions |
 |---|---|---|---|
 | `hako` | `hakobackend-db-hako` | push | yes (default, embedded, zero-setup) |
+| `hakocluster` | `hakobackend-db-hakocluster` | yes (via writer) | yes (via writer) — N Hako dirs, comma-separated; N>1 unix-only; refuses `sync_serve`/`sync_peer` (meshes itself) |
 | `sqlite` | `hakobackend-db-sqlite` | polling | yes (file/`:memory:`, FTS5) |
 | `postgres` | `hakobackend-db-postgres` | polling | yes (pool, JSONB) |
 | `mysql` | `hakobackend-db-mysql` | polling | yes (pool, JSON) |
