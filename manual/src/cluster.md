@@ -56,9 +56,18 @@ Hard limit, state it plainly: **each box keeps its own writer** (promote is per-
 
 When the operator wants the bridge managed (instead of hand-rolled per-box mesh/cloud), the cluster derives one extra member:
 
-- Config declares N serving paths plus **one** of `tailer_mesh {name, room_key, port}` (needs cargo feature `tailer-mesh`) or `tailer_cloud {client_id, room_name, room_key, auth_token, server_url}` (needs `tailer-cloud`). Both set, or knob set without its feature, or any tailer off-unix: fail-closed boot error.
+- Config declares N serving paths plus **one** of `tailer_mesh {name, room_key, port}` (needs cargo feature `tailer-mesh`) or `tailer_cloud` (needs `tailer-cloud`). Both set, or knob set without its feature, or any tailer off-unix: fail-closed boot error.
 - The tailer gets a derived sibling dir (`<first-dir>.tailer`), meshes locally like every member, then bridges outward. It never serves fan-out reads, is never promotable, and is always read-only.
 - Same LWW-across-boxes rule as the manual pattern; same single-writer-per-box. C ABI: `tailer_mesh` / `tailer_cloud` objects in the open config JSON (malformed shapes fail parse).
+
+### Cloud tailer: client or server
+
+`tailer_cloud` carries an explicit `mode` — no default (a silent default would point the bridge somewhere unintended):
+
+- `mode: "client"` + `room_name`/`room_key`/`server_url`: join someone's hub (edge box calling home).
+- `mode: "server"` + `bind_addr` (e.g. `"0.0.0.0:8080"`): host a room for other boxes' tailer-clients (regional hub). The server is room-agnostic by design, so `room_*` keys in server mode are refused, not ignored.
+
+Either side is still just a bridge: remote writes land via sync ingest (which bypasses the read-only flag by design, like all replicated ingest) and fan out locally over the socket tail. Writer-per-box and LWW still apply — a tailer-server does not make two boxes agree on one document.
 
 ## Common mistakes
 
