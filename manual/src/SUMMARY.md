@@ -19,3 +19,12 @@
 - [Durability, encryption, compression](durability.md)
 - [Backup and recovery](backup-recovery.md)
 - [Errors and fail-closed rules](errors.md)
+
+# Sync
+
+- [Sync concepts](sync-concepts.md)
+- [Mesh sync (LAN)](sync-mesh.md)
+- [Cloud sync (central hub)](sync-cloud.md)
+- [Socket sync (one box)](sync-socket.md)
+- [Sync encryption posture](sync-encryption.md)
+- [Cluster](cluster.md)

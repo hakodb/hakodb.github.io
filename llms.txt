@@ -14,4 +14,8 @@
   https://hakodb.github.io/docs/transactions.html https://hakodb.github.io/docs/watch.html https://hakodb.github.io/docs/durability.html https://hakodb.github.io/docs/backup-recovery.html
 - Errors: HakoError variants (Io, LockPoisoned, StorageError, QueryError, IndexError, Corrupt, InvalidInput); fail-closed rules (loud over empty, no silent clamping).
   https://hakodb.github.io/docs/errors.html
+- Sync: rooms, versions/deltas, LWW, echo suppression, withheld/excluded/local-only, same-minor lockstep; mesh guide (mDNS, rooms, troubleshooting), cloud guide (server/client, VersionPing, auth), socket plane (unix, balancer), encryption posture (wire vs at-rest, caps rule, operating).
+  https://hakodb.github.io/docs/sync-concepts.html https://hakodb.github.io/docs/sync-mesh.html https://hakodb.github.io/docs/sync-cloud.html https://hakodb.github.io/docs/sync-socket.html https://hakodb.github.io/docs/sync-encryption.html
+- Cluster: hakocluster dispatcher (reads fan out, writes route, promote/epoch, health), socket-sync companion, hakobackend relevance.
+  https://hakodb.github.io/docs/cluster.html
 - Source of truth for API: Rust engine `Hako` (97 pub fns), C ABI `hakodb.h` (179 fns), per-repo SDK READMEs under https://github.com/hakodb.
