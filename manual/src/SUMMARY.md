@@ -28,3 +28,18 @@
 - [Socket sync (one box)](sync-socket.md)
 - [Sync encryption posture](sync-encryption.md)
 - [Cluster](cluster.md)
+
+# SDKs
+
+- [C ABI reference](sdk-c-abi.md)
+- [JavaScript / TypeScript](sdk-js.md)
+- [Go](sdk-go.md)
+- [Pascal](sdk-pascal.md)
+- [Tauri](sdk-tauri.md)
+- [CLI](sdk-cli.md)
+- [HTTP backend](sdk-backend.md)
+
+# Shipping
+
+- [Real-product recipes](recipes.md)
+- [Operations](operations.md)
