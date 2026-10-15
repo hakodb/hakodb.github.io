@@ -60,9 +60,14 @@ When the operator wants the bridge managed (instead of hand-rolled per-box mesh/
 - The tailer gets a derived sibling dir (`<first-dir>.tailer`), meshes locally like every member, then bridges outward. It never serves fan-out reads, is never promotable, and is always read-only.
 - Same LWW-across-boxes rule as the manual pattern; same single-writer-per-box. C ABI: `tailer_mesh` / `tailer_cloud` objects in the open config JSON (malformed shapes fail parse).
 
-### Cloud tailer: client-only, hubs run standalone
+### Cloud tailer: client or server
 
-`tailer_cloud {client_id, room_name, room_key, auth_token, server_url}` joins a hub — there is deliberately no server mode on a tailer. Reason, proven by a failed e2e during development: the server broadcast only serves room-owned (prefixed) collections, while a box-local dataset lands plain — a tailer-server could never broadcast its own box. Run hubs standalone (`CloudSync::server` / `hakobackend` / `hakocloudserver`); bridge from the boxes as clients. Writer-per-box and LWW still apply — a tailer client does not make two boxes agree on one document.
+`tailer_cloud` carries an explicit `mode` — no default (a silent default would point the bridge somewhere unintended):
+
+- `mode: "client"` + `room_name`/`room_key`/`server_url`: join someone's hub (edge box calling home).
+- `mode: "server"` + `room_name`/`room_key`/`bind_addr` (e.g. `"0.0.0.0:8080"`): host this box's room for other boxes' tailer-clients. Works because single-room servers store plain names — the box-local dataset IS the room's data, so broadcast serves it directly (proven by a loopback server→client e2e in CI).
+
+Either side is still just a bridge: remote writes land via sync ingest (which bypasses the read-only flag by design, like all replicated ingest) and fan out locally over the socket tail. Writer-per-box and LWW still apply. C ABI mirrors the same `mode` key (bad mode, missing keys fail parse).
 
 ## Common mistakes
 
