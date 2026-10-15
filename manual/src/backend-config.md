@@ -7,8 +7,12 @@ host = "0.0.0.0"
 port = 3000
 
 # CHANGE DATABASE: edit 2 lines + POST /api/admin/reload. No rebuild.
-driver = "hako"            # hako | sqlite | postgres | mysql | rethinkdb
-data = "./data/hako.ub"    # file path (hako/sqlite) or DSN (postgres/mysql)
+driver = "hako"            # hako | hakocluster | sqlite | postgres | mysql | rethinkdb
+data = "./data/hako.ub"    # path (hako/sqlite), comma-separated dirs (hakocluster), DSN (postgres/mysql)
+
+# Socket peering with sibling backends (hako only, unix only, single-db):
+# sync_serve = "/run/hakobackend/hako.sock"
+# sync_peer = ["/run/other/hako.sock"]
 
 auth = "off"               # off | local | chain:github,local | ./custom.toml
 # admin_uids = ["local:root"]
