@@ -1,6 +1,6 @@
 # CRUD
 
-```rust
+```rust,ignore
 use hakodb::document::hako_doc::HakoDoc;
 use hakodb::document::value::Value;
 

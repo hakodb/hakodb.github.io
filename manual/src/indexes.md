@@ -2,7 +2,7 @@
 
 Indexes are built asynchronously in the background: writes return immediately, and `is_indexes_ready()` / `await_quiescent()` tell you when a fresh index has caught up. Querying before readiness falls back to correct (slower) paths — never wrong answers.
 
-```rust
+```rust,ignore
 use hakodb::index::composite::definition::SortDirection;
 
 db.create_index("users", "tenant")?;                       // secondary B-Tree

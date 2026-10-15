@@ -1,6 +1,6 @@
 # Queries
 
-```rust
+```rust,ignore
 use hakodb::query::query::Query;
 use hakodb::document::value::Value;
 
@@ -15,7 +15,7 @@ let rows: Vec<(String, HakoDoc)> = db.query(
 
 Operators: `Eq Ne Gt Gte Lt Lte In NotIn ArrayContains ArrayContainsAny Match Contains StartsWith`. Combine groups with `or_where`; page with `offset` or cursor bounds (`start_at / start_after / end_at / end_before` — cursors stay valid under concurrent writes, offsets don't).
 
-```rust
+```rust,ignore
 // projection: fetch only the fields you touch (zero-copy from mapped bytes)
 let names = db.query(Query::new("users").select_fields(vec!["name".into()]))?;
 

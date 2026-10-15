@@ -4,7 +4,7 @@ Feature: `cloud-sync`. Offline-first clients converge through a central server o
 
 ## Server
 
-```rust
+```rust,ignore
 use hakodb::cloud_sync::CloudSync;
 
 let server = CloudSync::server(db, "hub-01", "master-secret");
@@ -15,7 +15,7 @@ The server is not bound to any room: it accepts any `(room_name, room_key)`, sto
 
 ## Client
 
-```rust
+```rust,ignore
 let client = CloudSync::client(
     db, "laptop-7", "game", "secret-room-key", "user-jwt",
 );

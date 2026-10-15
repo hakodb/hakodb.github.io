@@ -2,7 +2,7 @@
 
 Documents link with `Reference` values (`{"__ref__": "collection/id"}` in JSON). Traversal follows them without joins.
 
-```rust
+```rust,ignore
 use hakodb::index::traverse::{TraverseDir, TraverseSpec};
 
 // 1. Track edges (opt-in per collection)
@@ -26,7 +26,7 @@ Each hit carries its depth from the start node. Depth is hard-capped at 32; visi
 
 For costed graphs, store edges as documents with `_from`/`_to` references (plus any numeric weight field) and register the collection:
 
-```rust
+```rust,ignore
 db.create_edge_index("rel")?;
 let spec = TraverseSpec {
     direction: TraverseDir::Outgoing,

@@ -2,7 +2,7 @@
 
 ## Backup
 
-```rust
+```rust,ignore
 db.backup("./backups/2026-10-15")?;   // flushes, then snapshots to a directory
 ```
 

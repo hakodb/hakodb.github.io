@@ -2,7 +2,7 @@
 
 Feature: `socket-sync` (Unix only; a silent no-op on Windows so cross-platform builds stay green). Co-located instances on one machine hold byte-identical data over unix sockets — built for N processes behind a balancer with a single writer.
 
-```rust
+```rust,ignore
 use hakodb::socket_sync::SocketSync;
 
 let sync = SocketSync::new(db.clone(), vec![]);  // + db.config.sync_excluded

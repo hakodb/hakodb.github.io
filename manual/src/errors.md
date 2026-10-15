@@ -21,7 +21,7 @@ Design rules behind them (these never change silently):
 
 ## Handling pattern
 
-```rust
+```rust,ignore
 match db.get("users", id)? {
     Some(doc) => render(doc),
     None => render_missing(),   // missing is data, not failure

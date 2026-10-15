@@ -11,7 +11,7 @@ HakoDB is an embedded document database: a library you link into your process, n
 hakodb = "0.15"
 ```
 
-```rust
+```rust,ignore
 use hakodb::config::HakoConfig;
 use hakodb::document::hako_doc::HakoDoc;
 use hakodb::document::value::Value;

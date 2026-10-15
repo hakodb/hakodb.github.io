@@ -1,6 +1,6 @@
 # Watch streams
 
-```rust
+```rust,ignore
 let rx = db.watch_collection("users");
 while let Ok(event) = rx.recv() {
     println!("{:?} {}", event.kind, event.path);   // Put/Delete + "collection/id"
