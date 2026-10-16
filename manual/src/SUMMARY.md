@@ -56,3 +56,10 @@
 - [Backend drivers](backend-drivers.md)
 - [Backend realtime, files, TTL](backend-realtime-files.md)
 - [Backend deploy](backend-deploy.md)
+
+# Cloud server (hakocloudserver)
+
+- [Cloud server overview](cloudserver-overview.md)
+- [Cloud server configuration](cloudserver-config.md)
+- [Cloud server console](cloudserver-console.md)
+- [Cloud server deploy](cloudserver-deploy.md)
