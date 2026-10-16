@@ -7,11 +7,12 @@ Feature: `cloud-sync`. Offline-first clients converge through a central server o
 ```rust,ignore
 use hakodb::cloud_sync::CloudSync;
 
-let server = CloudSync::server(db, "hub-01", "master-secret");
-server.start("0.0.0.0:8080").await?;   // room-agnostic: hosts any room
+// Bound to exactly one room: serves only (game, secret-room-key).
+let server = CloudSync::server(db, "hub-01", "master-secret", "game", "secret-room-key");
+server.start("0.0.0.0:8080").await?;
 ```
 
-The server is not bound to any room: it accepts any `(room_name, room_key)`, stores each room under its own prefix, and relays only within rooms. An ingress flusher micro-batches client writes (5ms / 512 ops); a WAL tailer broadcasts server-side writes to subscribers.
+The server stores collections under plain names and relays only within its room. An ingress flusher micro-batches client writes (5ms / 512 ops); a WAL tailer broadcasts server-side writes to subscribers. One server process = one room; multi-room hosting is N processes (or `hakocluster` multidb, one cluster per room).
 
 ## Client
 
@@ -32,7 +33,7 @@ Auth: the client presents its token; the server enforces per-room on receipt and
 
 | Symptom | Likely cause | Fix |
 |---|---|---|
-| Client connects, room stays empty | Wrong `room_name`/`room_key` (a different empty room) | Match both exactly |
+| Client connects, room stays empty | Wrong `room_name`/`room_key` — the server rejects the handshake (fail-closed, nothing stored) | Match both exactly |
 | Reconnect storms | Server unreachable + fixed retry cadence | Check URL/firewall; backoff lives in your supervisor, not the client |
 | Hub sees plaintext you expected hidden | No E2E: hub routes on cleartext room keys by design | See [Encryption posture](sync-encryption.md) — operator visibility is out of scope for at-rest keys |
 | Old client in a new room | Pre-capability peer treated as unverified | Upgrade it; plaintext rooms keep working meanwhile |

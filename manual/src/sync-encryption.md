@@ -1,4 +1,4 @@
-# Sync encryption posture
+﻿# Sync encryption posture
 
 Read this before encrypting anything that syncs. At-rest encryption and sync-time plaintext are **independent properties**: sync tailers read through the storage decryption layer and emit decoded documents, so an encrypted collection replicates as **plaintext on the wire** unless the rules below refuse the transfer. There is deliberately no silent path.
 
@@ -17,11 +17,11 @@ Admission control (groups, API keys, room keys) decides *who may join*; these ru
 
 ## How it works
 
-Every handshake carries encryption capabilities: mesh `SyncCaps` (`key_fp` = SHA-256 of the at-rest secret + encrypted collection list) after `Identify`; cloud `enc_fp`/`enc_cols` on `Authenticate`. One rule everywhere (`caps_allow`): a locally-encrypted collection flows **iff** the peer presented the same non-zero fingerprint. Everything else — old, keyless, wrong-key — is refused per collection with a throttled loud warning naming peer, collection, and key prefix. Catch-up re-sends anything skipped once caps arrive.
+Every handshake carries encryption capabilities: mesh `SyncCaps` (`key_fp` = SHA-256 of the at-rest secret + encrypted collection list) after `Identify`; cloud `enc_fp`/`enc_cols` on `Authenticate`. One rule everywhere (`caps_allow`): a locally-encrypted collection flows **iff** the peer presented the same non-zero fingerprint. Everything else — old, keyless, wrong-key — is refused per collection with a throttled loud warning naming peer and collection. Catch-up re-sends anything skipped once caps arrive.
 
 ## Operating it
 
-1. Same `encryption_key` on every node sharing the room; list it in `encrypted_cols` (empty = global). Cloud servers use **storage** names (`<prefix>_<collection>`); clients use plain names.
+1. Same `encryption_key` on every node sharing the room; list it in `encrypted_cols` (empty = global). Names are plain everywhere - server and client use the same collection names.
 2. Expect `[sync-guard]` warnings while any peer is keyless, wrong-keyed, or old — fix by distributing the key or upgrading, never by relaxing.
 3. There is intentionally **no override flag**. Mixed-version rooms keep working for plaintext throughout the upgrade.
 

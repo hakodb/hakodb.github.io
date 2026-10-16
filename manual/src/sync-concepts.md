@@ -1,10 +1,14 @@
-# Sync concepts
+﻿# Sync concepts
 
 All three planes replicate the same thing — **documents and index definitions** — with the same conflict rule: **last-write-wins (LWW)** by logical timestamp. Derived state (HNSW graphs, backlink indexes, edge secondaries) never travels; each node rebuilds it from replicated documents.
 
 ## Rooms
 
-A room is a sync group: mesh peers join by `room_key`; cloud clients join by `(room_name, room_key)`. Different keys = different rooms = fully isolated data, even on the same server. The cloud server is room-agnostic: it hosts any room, storing each room's collections under its own storage prefix.
+A room is a sync group: mesh peers join by `room_key`; cloud clients join by
+`(room_name, room_key)`. Different keys = different rooms. The cloud
+server is bound to exactly one room at construction and rejects anything
+else at handshake; multi-room hosting is N server processes (or
+`hakocluster` multidb, one cluster per room).
 
 ## Versions and deltas
 
