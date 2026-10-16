@@ -52,7 +52,7 @@ Every cluster member is a full `Hako` instance, so each box joins the LAN/cloud 
 
 Hard limit, state it plainly: **each box keeps its own writer** (promote is per-cluster; there is no cross-box election). Concurrent writes to the same document on two boxes converge by last-write-wins — one side wins silently. This pattern fits write-partitioned workloads (edge regions, tenant affinity), never shared counters or ledgers. If two boxes must coordinate one document, that document belongs on one box (or behind one backend).
 
-## Tailer variant: N+1 with a dedicated bridge (issue #23)
+## Tailer variant: N+1 with a dedicated bridge
 
 When the operator wants the bridge managed (instead of hand-rolled per-box mesh/cloud), the cluster derives one extra member:
 
