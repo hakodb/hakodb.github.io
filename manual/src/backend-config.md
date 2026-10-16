@@ -14,6 +14,21 @@ data = "./data/hako.ub"    # path (hako/sqlite), comma-separated dirs (hakoclust
 # sync_serve = "/run/hakobackend/hako.sock"
 # sync_peer = ["/run/other/hako.sock"]
 
+# Cluster N+1 sync tailer (hakocluster driver only, default database
+# only, file-only, boot-time). At most one lane.
+# [cluster.tailer_mesh]
+# name = "box-a"
+# room_key = "shared-room-secret"
+# port = 17891
+# [cluster.tailer_cloud]
+# mode = "client"  # or "server"
+# client_id = "box-a"
+# auth_token = "shared-secret"
+# room_name = "ops"
+# room_key = "shared-secret"
+# server_url = "ws://hub:8080"   # client mode
+# bind_addr = "0.0.0.0:8080"     # server mode
+
 auth = "off"               # off | local | chain:github,local | ./custom.toml
 # admin_uids = ["local:root"]
 rules = "./policy.toml"    # hot-reloaded; empty = OPEN dev mode (never prod)
