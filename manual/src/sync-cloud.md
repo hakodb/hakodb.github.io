@@ -14,6 +14,8 @@ server.start("0.0.0.0:8080").await?;
 
 The server stores collections under plain names and relays only within its room. An ingress flusher micro-batches client writes (5ms / 512 ops); a WAL tailer broadcasts server-side writes to subscribers. One server process = one room; multi-room hosting is N processes (or `hakocluster` multidb, one cluster per room).
 
+For a batteries-included hub — N rooms per process, per-room databases, hub secrets, and a web admin console — run [hakocloudserver](cloudserver-overview.md) instead of hand-rolling `CloudSync::server`.
+
 ## Client
 
 ```rust,ignore
