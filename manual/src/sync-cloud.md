@@ -29,6 +29,8 @@ client.stop();
 
 On connect, both sides exchange `VersionPing` (versions + index defs, room-scoped) and the ahead side sends catch-up — symmetrical, so either side recovers missed deltas after downtime. `https://` URLs convert to `wss://` automatically (proxies, tunnels, ALBs all fine).
 
+Catch-up is per-collection and strictly `>`, keyed on the collection version clock — not per document and not `>=`. A hub document written before a client joins replicates to that client normally, but if the *collection's* version clock happens to be identical on both sides (both at `1`, for example), neither side is "ahead" and nothing is pulled. Practical rule: if a fresh client must receive pre-existing hub data deterministically, write hub data so the hub's collection versions advance past the client's (e.g. after it joins), or give client-produced collections their own names instead of mirroring a hub-written collection name in opposite directions.
+
 Auth: the client presents its token; the server enforces per-room on receipt and relay. Group API keys and user stores live in sync-excluded internal collections.
 
 ## Troubleshooting
