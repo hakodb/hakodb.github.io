@@ -24,3 +24,5 @@ Direct TLS for the admin console: `--tls-cert fullchain.pem --tls-key privkey.pe
 | Client connects, room stays empty | Wrong `room_name`/`room_key` — rejected at handshake, nothing stored | Match the pair exactly |
 | Console shows no admin prompt but login fails | Different room: each room has its own users | Create the admin in the room you log into |
 | Rejected peer's data appears anyway | Check you are looking at the right room's console (sessions bind one room) | Re-login to the intended room and compare |
+| Sync port unreachable from other hosts despite the process listening | Inbound firewall on the hub host | Allow the room's sync bind port; on DENY-by-default hosts with terminal `RETURN` rules, insert the ACCEPT before the chain's `RETURN` — an ACCEPT appended after it is never evaluated |
+| Build from source fails inside a C library build script | A wedged ccache intercepting the compiler | Run the build with `CCACHE_DISABLE=1` |
