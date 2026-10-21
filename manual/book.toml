@@ -8,3 +8,4 @@ src = "src"
 site-url = "/docs/"
 git-repository-url = "https://github.com/hakodb/hakodb.github.io"
 edit-url-template = "https://github.com/hakodb/hakodb.github.io/edit/main/manual/{path}"
+additional-css = ["theme/seo.css"]
