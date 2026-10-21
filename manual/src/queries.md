@@ -33,6 +33,8 @@ let total = db.execute_aggregation(/* ... */)?;
 
 You don't pick the strategy; you shape the odds: index the fields you filter on (see [Indexes](indexes.md)). Unindexed queries are never wrong, just slower.
 
+For the measured planner behavior and open work, read the [query planner study](query-planner.md). For raw, borrowed, and paginated read paths, see [Reading data](reads.md); for aggregation stages, see [Pipelines](pipelines.md).
+
 ## Common mistakes
 
 - **Deep `offset` pagination.** `offset(100000)` still walks 100k rows. Use cursor bounds for infinite scroll.

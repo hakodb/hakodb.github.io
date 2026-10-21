@@ -1,10 +1,19 @@
 # JavaScript / TypeScript SDK
 
-Package `@hakodb/client` (`hakodb/hakojs`, currently `0.5.19`). Two layers: a high-level Firestore-shaped client over native FFI bindings (`koffi` on Node, Bun FFI on Bun).
+Package `@hakodb/client` (`hakodb/hakojs`, currently `0.5.22`). Two layers: a high-level Firestore-shaped client (`client.ts`) over native FFI bindings (`native.ts`; `koffi` on Node, Bun FFI on Bun).
 
 ```sh
 npm i @hakodb/client
 ```
+
+`native.ts` loads the HakoDB cdylib. Resolution order: `loadNativeBindings(explicitPath)` → `HAKODB_LIB_PATH` env → `./native/<lib>`. Populate it with the repo's sync script:
+
+```powershell
+.\sync-native.ps1 -CoreDir C:\Dev\libs\hakodb
+.\sync-native.ps1 -Tag v0.16.7
+```
+
+Binaries under `native/` are git-ignored.
 
 ```ts
 import { HakoClient } from "@hakodb/client";

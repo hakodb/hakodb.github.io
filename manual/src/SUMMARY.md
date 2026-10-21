@@ -11,7 +11,9 @@
 
 - [CRUD](crud.md)
 - [Queries](queries.md)
+- [Pipelines](pipelines.md)
 - [Indexes](indexes.md)
+- [Reading data](reads.md)
 - [Vector search](vector.md)
 - [Graph traversal](graph.md)
 - [Batches and transactions](transactions.md)
@@ -25,6 +27,8 @@
 - [Sync concepts](sync-concepts.md)
 - [Mesh sync (LAN)](sync-mesh.md)
 - [Cloud sync (central hub)](sync-cloud.md)
+- [Scaling writer pods](scaling.md)
+- [LAN relay](lan-relay.md)
 - [Socket sync (one box)](sync-socket.md)
 - [Sync encryption posture](sync-encryption.md)
 - [Cluster](cluster.md)
@@ -38,11 +42,20 @@
 - [Tauri](sdk-tauri.md)
 - [CLI](sdk-cli.md)
 - [HTTP backend](sdk-backend.md)
+- [Backend TypeScript client](sdk-backend-ts.md)
 
 # Shipping
 
 - [Real-product recipes](recipes.md)
 - [Operations](operations.md)
+- [Benchmarking](benchmarking.md)
+- [MCP server](mcp.md)
+- [Balancer](balancer.md)
+
+# Internals
+
+- [Query planner study](query-planner.md)
+- [Codec perf baseline](perf-baseline.md)
 
 # Backend (hakobackend)
 

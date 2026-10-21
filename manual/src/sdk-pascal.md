@@ -1,6 +1,19 @@
 # Pascal SDK (Lazarus / Free Pascal)
 
-`hakodb/hakopascal` (currently `0.1.7`). Two units plus design-time components: `HakoRaw.pas` (direct `cdecl` imports from `hakodb.dll`), `Hako.pas` (friendly wrapper), `HakoCluster.pas` (cluster unit), installable `HakoComponent`/`HakoDesign` packages.
+`hakodb/hakopascal` (currently `0.1.10`). Two units plus design-time components: `HakoRaw.pas` (direct `cdecl` imports from `hakodb.dll`), `Hako.pas` (friendly wrapper), `HakoCluster.pas` (cluster unit), installable `HakoComponent`/`HakoDesign` packages.
+
+Put `hakodb.dll` next to your binary, on `PATH`, or under `./native/`. Populate `native/` with the sync script; binaries there are git-ignored:
+
+```powershell
+.\sync-native.ps1 -CoreDir C:\Dev\libs\hakodb
+.\sync-native.ps1 -Tag v0.16.7
+```
+
+The wrapper ships as two Lazarus packages, the standard runtime/designtime split:
+
+- `HakoPkg.lpk` — runtime: `HakoRaw`, `Hako`, `HakoComponent`. Add it via Project Inspector → Add → New Requirement to use the SDK from code.
+- `HakoDesign.lpk` — designtime (requires `HakoPkg`): `HakoPkgReg` with the `Register` procedure. Open via `Package > Open Package File (.lpk)`, Compile, then **Install** — a **HakoDB** tab with `THakoComponent` appears on the component palette.
+- `HakoComponent.pas` — drop-on-form component. Sync is opt-in: `NetSyncEnabled` / `CloudSyncEnabled` default to False (`StartNetSync` / `StartCloudSync` raise otherwise).
 
 ```pascal
 uses Hako;

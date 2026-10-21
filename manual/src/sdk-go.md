@@ -1,9 +1,21 @@
 # Go SDK
 
-Module `github.com/hakodb/hako-go` (`hakodb/hakogo`, currently `0.1.7`). cgo bindings over the C ABI; the Windows DLL ships under `third_party/lib` (other platforms: point cgo at a local release asset).
+Module `github.com/hakodb/hakogo` (package `hako`, repo `hakodb/hakogo`, currently `0.1.9`). cgo bindings over the C ABI with a fluent document layer.
+
+Populate `third_party/` (canonical `hakodb.h` + platform binary) with the repo's sync script. Headers are committed; binaries under `third_party/lib/` are git-ignored. `go build`/`go vet` need a C compiler on `PATH` (MinGW gcc on Windows).
+
+```powershell
+.\sync-core.ps1 -CoreDir C:\Dev\libs\hakodb
+.\sync-core.ps1 -Tag v0.16.7
+```
+
+```sh
+./sync-core.sh --core-dir /path/to/hakodb
+./sync-core.sh --tag v0.16.7
+```
 
 ```go
-import "github.com/hakodb/hako-go/hako"
+import "github.com/hakodb/hakogo/hako"
 
 eng, err := hako.Open("./data")
 if err != nil { log.Fatal(err) }
