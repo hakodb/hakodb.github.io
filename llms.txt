@@ -1,7 +1,9 @@
-# HakoDB Docs — llms.txt
+# HakoDB — llms.txt
 
-> HakoDB: embedded document database (Rust) with vector + graph search and multi-plane sync. These notes map the manual at https://hakodb.github.io/docs/ for AI assistants. Code identifiers are exact; verify signatures against hakodb source or docs.rs before generating calls.
+> HakoDB: embedded document database (Rust) with vector + graph search and multi-plane sync. These notes map the site root and the manual at https://hakodb.github.io/docs/ for AI assistants. Code identifiers are exact; verify signatures against hakodb source or docs.rs before generating calls.
 
+- Site: product overview, features, sync modes, SDK install table, quickstart, and the manual index.
+  https://hakodb.github.io/ https://hakodb.github.io/docs/
 - Start here: intro, concepts (collections, typed values, in-process model), choosing a mode (embedded vs net/cloud/socket sync).
   https://hakodb.github.io/docs/intro.html https://hakodb.github.io/docs/concepts.html https://hakodb.github.io/docs/choosing-mode.html
 - Core: CRUD (put/get/patch/delete/subdocuments), queries (filters, order, cursors, aggregates, planner), pipelines (match/project/sort/limit/offset/unwind/group, no joins), indexes (secondary/composite/FTS, background readiness), reading paths (decoded/raw/walk/view, keyset paging, blob semantics).
