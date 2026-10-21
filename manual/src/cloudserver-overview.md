@@ -1,6 +1,6 @@
 # Cloud server overview
 
-`hakocloudserver` (`hakodb/hakocloudserver`) is a standalone cloud-sync hub with an admin console: one process hosts N independent rooms, each with its own database and its own sync listener, plus one HTTP admin plane scoped to the room you log into.
+`hakocloudserver` (`hakodb/hakocloudserver`, currently `0.1.1`) is a standalone cloud-sync hub with an admin console: one process hosts N independent rooms, each with its own database and its own sync listener, plus one HTTP admin plane scoped to the room you log into.
 
 ```
 devices (offline-first clients)
