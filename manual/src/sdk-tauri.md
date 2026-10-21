@@ -1,13 +1,41 @@
 # Tauri SDK (Rust gateway + TypeScript client)
 
-Two halves: `hakotauri` (`0.4.10`, Rust gateway crate) exposes the engine as binary Tauri commands; `@hakodb/tauri` (`0.3.5`, `hakodb/hakotaurits`) calls them over `invoke` with MessagePack payloads and `onSnapshot` listeners.
+Two halves: `hakotauri` (`0.4.11`, Rust gateway crate) exposes the engine as binary Tauri commands; `@hakodb/tauri` (`0.3.5`, `hakodb/hakotaurits`) calls them over `invoke` with MessagePack payloads and `onSnapshot` listeners. The gateway and client versions move together: the op enum in `src/tauri.ts` must match `HakoOp` in the Rust crate.
+
+```sh
+npm i @hakodb/tauri
+```
+
+Register the gateway in `src-tauri`:
 
 ```rust,ignore
-// src-tauri: register the gateway (see hakotauri README for the full setup)
 tauri::Builder::default()
-    .invoke_handler(/* hako commands */)
-    .run(tauri::generate_context!())
+    .manage(hakotauri::HakoGateway::new(db))
+    .manage(hakotauri::net_sync::NetSyncState::new(app_handle.clone()))
+    .manage(hakotauri::cloud_sync::CloudSyncState::new(app_handle.clone()))
+    .invoke_handler(tauri::generate_handler![
+        hakotauri::gateway::hako_exec,
+        hakotauri::net_sync::toggle_net_sync,
+        hakotauri::net_sync::get_sync_status,
+        hakotauri::net_sync::list_network_peers,
+        hakotauri::net_sync::prepare_sync_restore,
+        hakotauri::net_sync::bootstrap_sync,
+        hakotauri::cloud_sync::toggle_cloud_sync,
+        hakotauri::cloud_sync::get_cloud_sync_status,
+        hakotauri::cloud_sync::get_cloud_peers,
+        hakotauri::cloud_sync::get_cloud_config,
+        hakotauri::cloud_sync::cloud_group_get,
+        hakotauri::cloud_sync::cloud_group_new_key,
+        hakotauri::cloud_sync::cloud_group_set,
+        hakotauri::cloud_sync::cloud_group_add_member,
+        hakotauri::cloud_sync::cloud_group_remove_member,
+        hakotauri::cloud_sync::bootstrap_cloud_sync,
+    ])
 ```
+
+Use the **module path** (`gateway::hako_exec`), not the root re-export: the `#[command]` wrapper macro resolves through the same module as the function. The root re-export covers types and direct calls.
+
+The gateway re-exports engine types (`Hako`, `HakoConfig`, `HakoDoc`, `Value`, `Query`, …), so Tauri backend code uses the same API as the [Rust core](crud.md) without a direct `hakodb` dependency. Pin sync planes explicitly with `default-features = false, features = ["net-sync", "cloud-sync"]` to stay immune to future default changes.
 
 ```ts
 import { collection, doc, setDoc, getDoc, query, where, getDocs, onSnapshot } from "@hakodb/tauri";
@@ -20,7 +48,8 @@ const unsub = onSnapshot(collection(db, "users"), (docs) => render(docs));
 
 Notes:
 
-- The gateway re-exports engine types (`Hako`, `HakoConfig`, `HakoDoc`, `Value`, `Query`, …), so Tauri backend code uses the same API as the [Rust core](crud.md) without a direct `hakodb` dependency.
+- Tauri `2.11` + `tauri-macros 2.6` + `tauri-runtime 2.11` are the supported line. The minor is unpinned on purpose so cargo unifies one Tauri version across the SDK and the consumer binary; two Tauri versions in one binary mean incompatible `State`/`Window` types and unregistrable commands.
+- Watch subscriptions prebuild a filter plan once (`Hako::plan_for_watch`) and match per-event bytes with zero decode (`Hako::matches_watch`).
 - Sync planes are opt-in features on the gateway (`net-sync`, `cloud-sync`, `socket-sync`): enable what the app needs; the TS side calls the same sync ops.
 - `flushDatabase` / `listStorageKeys` cover the consumer ops (durability control, storage inspection).
 - Graph and vector ops are wired through (`createTraverseIndex`, `findPaths`, `createEdgeIndex`, `findNear`).

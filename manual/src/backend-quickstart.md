@@ -16,6 +16,23 @@ curl -X POST localhost:3000/api/collections/users \
 curl localhost:3000/api/collections/users
 ```
 
+From source, or with containers:
+
+```sh
+cargo run -p hakobackend-server -- --config hakobackend.example.toml
+cargo run -p hakobackend-server -- --config hakobackend.example.toml --validate
+cargo run -p hakobackend-server -- --print-default-config
+cargo install --git https://github.com/hakodb/hakobackend
+
+# release images: ghcr.io/hakodb/hakobackend:<tag> (:latest, :edge)
+docker run --rm -p 3000:3000 \
+  -v "$PWD/hakobackend.toml:/etc/hako/hakobackend.toml:ro" \
+  -v "$PWD/data:/data" \
+  ghcr.io/hakodb/hakobackend:latest --config /etc/hako/hakobackend.toml
+```
+
+The library crates are path-only on purpose; ship the binary, not 13 crates. Release assets are a Windows zip and a fully static musl Linux tarball. The deploy script expects the tarball name.
+
 Path rule (legacy parity): **even segments = document, odd = collection** — `/api/collections/users` lists, `/api/collections/users/1` reads one. `POST` creates, `PUT` replaces, `PATCH` merges (404 when absent — use PUT to create), `DELETE` removes.
 
 TypeScript clients use `@hakodb/backend` (see [HTTP backend SDK](sdk-backend.md)); every other language speaks the same HTTP + WebSocket wire.

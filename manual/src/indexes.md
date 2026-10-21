@@ -19,7 +19,7 @@ db.list_indexes(Some("users"));                             // inspect
 - **FTS**: token/prefix search over text fields.
 - **Vector / graph**: their own chapters ([Vector](vector.md), [Graph](graph.md)) — same readiness contract.
 
-Index snapshots persist across restarts; after compaction or recovery the engine rewrites them automatically.
+Index snapshots persist across restarts; after compaction or recovery the engine rewrites them automatically. Readiness is per collection: a pending write in one collection no longer forces every other collection to a full scan. See the [query planner study](query-planner.md) for the measurements and the [reading paths](reads.md) page for raw and borrowed scans.
 
 ## Common mistakes
 

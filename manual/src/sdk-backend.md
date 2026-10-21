@@ -4,7 +4,7 @@
 
 Wire contract: `GET /api/health`, `GET /api/ready`, CRUD under `/api/collections/{path}`, `POST /api/indexes`, `GET /ws`, `GET /api/stream/{collection}`, `POST /api/files/…`. Full contract: `HTTP_CONTRACT.md` in the backend repo; auth: `AUTH_CONTRACT.md`; policy: `SECURITY_RULES.md` + `policy.standard.toml`.
 
-TypeScript clients use `@hakodb/backend` (`hakodb/hakobackend-ts`):
+TypeScript clients use [`@hakodb/backend`](sdk-backend-ts.md) (`hakodb/hakobackend-ts`):
 
 ```ts
 import { hakobackend, Query } from "@hakodb/backend";

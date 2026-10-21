@@ -6,6 +6,14 @@
 - **Disk**: segments + WAL + index snapshots. WAL peaks under write bursts — reserve 2× your largest import batch plus headroom, and alert at 80%.
 - **Workers**: `query_workers` scales parallel scans; the background indexer and compactor are already async. More threads help scans, not single-doc latency.
 
+## Scaling the cloud hub
+
+Single-process catch-up saturates the send+apply path; the knob that moves aggregate throughput is the number of independent serve points. Use one writer pod plus read-only replica pods on the same room, wired over the engine mesh: [Scaling writer pods and mesh replicas](scaling.md). For many LAN peers behind one cloud pull, use the manual relay: [LAN relay](lan-relay.md).
+
+## Benchmarking before and after changes
+
+Settle background work before measuring, and compare equal work. The harness, profiles, gate, and reference numbers are on the [Benchmarking](benchmarking.md) page.
+
 ## Upgrading versions
 
 1. Read the CHANGELOG entry for the target version (wire/format notes live there).

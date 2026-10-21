@@ -27,7 +27,7 @@ Development and bulk import usually want `Manual` + explicit `flush()`; producti
 
 ChaCha20-Poly1305 over WAL and segment payloads. `encrypted_cols = None` encrypts all collections; `Some(set)` encrypts only those. Key management is yours: lose the key and the data is unrecoverable, by design.
 
-Critical interaction: at-rest encryption and sync are **independent** — encrypted collections replicate as plaintext unless the sync guards refuse (see the encryption posture in the README). Same key on every node that must share a room.
+Critical interaction: at-rest encryption and sync are **independent** — encrypted collections replicate as plaintext unless the sync guards refuse (see [Sync encryption posture](sync-encryption.md)). Same key on every node that must share a room.
 
 ## Compression
 
