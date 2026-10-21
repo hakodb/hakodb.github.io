@@ -1,10 +1,18 @@
 # Balancer (hakobalancer)
 
-`hakobalancer` is a stateless L7 balancer over `hakobackend` upstreams (TCP and unix socket).
-
-Status: scaffold (config, pool, and health checks). The proxy loop is next. Design lives in issue #1; lease and fencing follow issue #2 and require balancer HA first, which is not part of phase 1.
+`hakobalancer` is a stateless L7 balancer over `hakobackend` upstreams. It accepts TCP and unix-socket upstreams.
 
 ```toml
 [dependencies]
 hakobalancer = "0.1"
 ```
+
+## Status
+
+The crate currently provides configuration loading, the upstream pool, and health checks. The proxy loop is not implemented yet, so it is not ready to serve production traffic.
+
+## Scope
+
+- Health-aware upstream selection for `hakobackend`.
+- TCP and unix-socket upstreams.
+- No persistent state; any instance can be replaced.

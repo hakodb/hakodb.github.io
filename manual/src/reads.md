@@ -1,20 +1,15 @@
 # Reading data: choosing the right path
 
-HakoDB offers four read granularities for the same stored bytes. They
-differ in per-row cost by orders of magnitude, so picking by habit leaves
-5–50x on the table. Rule of thumb: **return the least materialization
-that answers the question.**
+HakoDB offers four read granularities for the same stored bytes. Rule of thumb: **return the least materialization that answers the question.**
 
 | Path | Per-row work | Use when |
 |---|---|---|
-| `get` / `query` (decoded) | Full owned `HakoDoc` (~1–7µs, size-dependent) | You need whole documents as values |
-| `query_raw` | Pinned bytes, no decode (~1µs) | Export, hash, relay, count bytes |
-| `walk` | Borrowed bytes, zero allocs (~0.4µs) | Full scans: count, filter, copy out |
-| `get_view` / `walk_view` | Borrow + pull only touched fields (~0.2µs + ~0.2µs/pull) | Sparse reads: 2 fields out of 20 |
+| `get` / `query` (decoded) | Full owned `HakoDoc` | You need whole documents as values |
+| `query_raw` | Pinned bytes, no decode | Export, hash, relay, count bytes |
+| `walk` | Borrowed bytes, no allocations | Full scans: count, filter, copy out |
+| `get_view` / `walk_view` | Borrow and pull only touched fields | Sparse reads: a few fields out of many |
 
-Numbers: in-process release, 20k docs (see the
-[Benchmarking](benchmarking.md) page for methodology).
-All four agree field-for-field — see `tests/codec_integrity.rs`.
+All four return the same field values for the same stored document. See [Benchmarking](benchmarking.md) for measuring a read path on your hardware.
 
 ## Point reads
 
@@ -76,17 +71,16 @@ q.limit = Some(1000);
 // per page: q = q.start_after(vec![Value::String(last_id)]);
 ```
 
-`limit`/`offset` truncate downstream; deep pages cost the same as shallow
-ones (O(log N) anchor seek). Contrast: offset-based paging degrades
-linearly with depth — see the `query_offset`/`query_cursor` groups in
-`benches/read_path.rs`.
+`limit`/`offset` truncate downstream; keyset pages seek directly to the
+anchor. Offset-based paging still walks every skipped row, so its cost
+grows with depth.
 
 ## Before you measure or paginate: readiness
 
 `Hako::open` returns while index recovery still runs in the
-background. Queries issued first silently plan full scans (cursor bounds
-ignored, pages repeat). Pending writes gate only their own collection
-(#104); open-time recovery still gates all of them. Poll before scanning:
+background. Queries issued first can plan full scans, so cursor bounds
+may be ignored and pages may repeat. Pending writes gate only their own
+collection; open-time recovery gates all of them. Poll before scanning:
 
 ```rust
 while !db.is_indexes_ready() { /* sleep briefly, bounded */ }
@@ -94,11 +88,10 @@ while !db.is_indexes_ready() { /* sleep briefly, bounded */ }
 db.await_quiescent(Duration::from_secs(30)); // indexes + index worker + blobs + maintenance
 ```
 
-`await_quiescent` (and `quiescence_status()` for diagnostics) is the
-difference between benchmarking the engine and benchmarking contention.
+`await_quiescent` waits for indexes, the index worker, blobs, and
+maintenance. `quiescence_status()` reports what is still outstanding.
 FFI: `hk_engine_await_quiescent` / `hk_engine_quiescence_status`. Settle
-before scans — quiescence is what separates benchmarking the engine from
-benchmarking contention.
+before scans when the result needs to reflect a stable database.
 
 ## Blob semantics (the fine print)
 

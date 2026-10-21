@@ -1,6 +1,6 @@
 # Backend auth
 
-The backend verifies; only `local` issues. Providers fill `AuthContext{uid, extra}` — policy rules never know which provider verified you.
+The backend verifies; only the `local` provider issues tokens. Providers fill `AuthContext{uid, extra}` — policy rules never know which provider verified you.
 
 ```toml
 # auth = "off"                  # anonymous (dev only)

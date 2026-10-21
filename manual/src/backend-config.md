@@ -44,7 +44,7 @@ limit_auth = 20            # stricter layer for /api/auth/*
 
 Notes:
 
-- **Co-located SQL over unix socket** (measured much faster than TCP on weak CPUs): postgres `data = "postgres://user:pass@%2Fvar%2Frun%2Fpostgresql/dbname"`, mysql with `?socket=...`.
+- **Co-located SQL over unix socket** (lower overhead than TCP): postgres `data = "postgres://user:pass@%2Fvar%2Frun%2Fpostgresql/dbname"`, mysql with `?socket=...`.
 - **Multidatabase**: `[databases]` adds named DBs (`?db=` on every route); `data` is always `default`. Policy uses dotted names (`akademik.mahasiswa`, quoted in TOML).
 - **Reload vs restart**: `POST /api/admin/reload` (admin UIDs only) picks up DB/auth/policy/limits/indexes. Port/listen/TLS/socket changes need a restart.
 - **Secrets never live in config files**: provider params via env (`UB_LOCAL_JWT_SECRET` min 32 chars, `UB_FIREBASE_PROJECT`, `UB_OIDC_ISSUER`, …).
