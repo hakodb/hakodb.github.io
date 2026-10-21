@@ -21,7 +21,7 @@ db.flush()?;   // force everything to disk now, regardless of mode
 | `OnCommit` | Batch commit is atomic | Grouped writes, single flush. |
 | `Manual` | Only on `flush()` | Fastest, you own the risk. |
 
-Development and bulk import usually want `Manual` + explicit `flush()`; production usually wants `Always` or `Interval`. Benchmarks in this repo's history were measured per-mode — compare numbers only within the same mode.
+Development and bulk import usually want `Manual` + explicit `flush()`; production usually wants `Always` or `Interval`. Compare throughput only within the same durability mode.
 
 ## Encryption
 

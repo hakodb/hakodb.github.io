@@ -10,9 +10,9 @@
 
 Single-process catch-up saturates the send+apply path; the knob that moves aggregate throughput is the number of independent serve points. Use one writer pod plus read-only replica pods on the same room, wired over the engine mesh: [Scaling writer pods and mesh replicas](scaling.md). For many LAN peers behind one cloud pull, use the manual relay: [LAN relay](lan-relay.md).
 
-## Benchmarking before and after changes
+## Benchmarking
 
-Settle background work before measuring, and compare equal work. The harness, profiles, gate, and reference numbers are on the [Benchmarking](benchmarking.md) page.
+Settle background work before measuring, and compare equal work. Build and run instructions, profiles, and metrics are on the [Benchmarking](benchmarking.md) page.
 
 ## Upgrading versions
 
@@ -34,6 +34,6 @@ Automate `backup()` (or stopped file copies) on a schedule; verify restores quar
 | Binary won't start after upgrade | Version/format note in CHANGELOG; restore backup + previous binary. |
 | Mobile sync dies in background | OS suspension — foreground service / background modes, per platform. |
 
-## When to ask for help
+## Reporting a problem
 
-File issues with: versions (core + SDK), the full error string, the smallest reproduction (a `hakocli` command sequence is ideal), and whether sync is involved and which plane. "Slow" reports need `explain()` output and the durability mode.
+Include versions (core + SDK), the full error string, the smallest reproduction (a `hakocli` command sequence is ideal), and whether sync is involved and which plane. For slow queries, include `explain()` output and the durability mode.

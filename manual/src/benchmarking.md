@@ -1,10 +1,10 @@
 # Benchmarking HakoDB
 
-The official harnesses live in `hakodb/hakobench` (currently `0.1.1`). There is no CI in that repo by design: run it locally against a core checkout or a release asset. Two rules cover most benchmark sins: **settle before measuring**, and **compare equal work**.
+The official harnesses live in `hakodb/hakobench` (currently `0.1.1`). Run them locally against a core checkout or a release asset. Two rules matter: **settle background work before measuring**, and **compare equal work**.
 
 ## Build (Windows, MinGW)
 
-`HAKODB_DIR` points at a core checkout (default `../hakodb`). `-I` takes the core's release directory because `build.rs` generates `hakodb.h` next to the binaries; there is no checked-in header since `0.9.1`.
+`HAKODB_DIR` points at a core checkout (default `../hakodb`). `-I` takes the core's release directory because `build.rs` generates `hakodb.h` next to the binaries.
 
 ```powershell
 $env:HAKODB_DIR = "C:\Dev\libs\hakodb"
@@ -48,7 +48,7 @@ g++ -O2 -std=c++17 -I$HAKODB_DIR/include benchmark.cpp \
 ./benchmark --profile=Segment --docs=1000
 ```
 
-Use `--docs >= 1000` for meaningful numbers. Each run creates and destroys temporary `bench_data_*` directories; no existing database is touched. A full `--docs=10000` run takes several minutes because durable profiles fsync per write and the Gaming profile moves about 500 MB.
+Use `--docs >= 1000` for meaningful results. Each run creates and destroys temporary `bench_data_*` directories; existing databases are not touched. A full `--docs=10000` run takes several minutes because durable profiles fsync per write and the Gaming profile moves about 500 MB.
 
 ## What it measures
 
@@ -68,66 +68,45 @@ Use `--docs >= 1000` for meaningful numbers. Each run creates and destroys tempo
 
 Profiles: `Always`, `Interval`, `Manual`, `OnCommit`, `Enc_Comp` (encrypted + compressed), and `Gaming` (large documents, parallel workers). `Segment` is a diagnostic profile (0 inline budget, 1 MB rotation) that spills WAL-inlined docs into segments and reports the segment/WAL inventory plus a timed `compact()`.
 
-The `EXTENDED` section covers the `hakodb#71` index families: `dotted` (F2), `cover`/`proj` (F6), and `uniq` (F1). Select them with `--index-groups` (default `std`):
+The `EXTENDED` section covers additional index families. Select them with `--index-groups` (default `std`):
 
 | Group | Indexes |
 |---|---|
-| `std` | simple/secondary (`active`, `tenant`, `id`, `age`) + plain composites (`[id]`, `[tenant,score]`) |
-| `f2f6` | F1 unique (`uniqbench.slug`), F2 dotted (`[profile.city]`), F6 covering (`[tenant,active]`) |
-| `vector` | vector index on `bench.emb` (32-dim), plus a kNN lane |
-| `graph` | edge index on a 200-node/200-edge graph, plus BFS and edge-write lanes |
+| `std` | Secondary indexes (`active`, `tenant`, `id`, `age`) and plain composites (`[id]`, `[tenant,score]`) |
+| `f2f6` | Unique (`uniqbench.slug`), dotted (`[profile.city]`), and covering (`[tenant,active]`) indexes |
+| `vector` | Vector index on `bench.emb` (32-dim), plus a kNN lane |
+| `graph` | Edge index on a 200-node/200-edge graph, plus BFS and edge-write lanes |
 
 ## Settle first
 
-A freshly written database is not a settled one. Four background stages run asynchronously: open-time index recovery, async index updates, blob persistence, and periodic maintenance (checkpoint/compaction/snapshots). Reads issued mid-flight measure contention; swings as large as 1000x have been observed.
+A freshly written database is not a settled one. Four background stages run asynchronously: open-time index recovery, async index updates, blob persistence, and periodic maintenance (checkpoint/compaction/snapshots). Reads issued during that work measure contention, not the settled database.
 
 ```rust
 // After fill, before every measured stage:
 assert!(db.await_quiescent(Duration::from_secs(30)));
 
-// Debugging a weird number? Ask what is outstanding:
+// Inspect what is still outstanding:
 let s = db.quiescence_status();
 // indexes_ready, pending_index_ops, index_backfills, pending_blob_bytes,
 // queued_blob_items, maintenance_running — plus is_quiescent()
 ```
 
-FFI: `hk_engine_await_quiescent(db, 30000)` and `hk_engine_quiescence_status(db)` (JSON; free with `hk_string_free`). `is_indexes_ready()` covers only the first of the four stages — enough for correct plans, not for stable numbers.
+FFI: `hk_engine_await_quiescent(db, 30000)` and `hk_engine_quiescence_status(db)` (JSON; free with `hk_string_free`). `is_indexes_ready()` covers only the first of the four stages.
 
 ## Compare equal work
 
-| Shape | HakoDB op | Fair rival op | Notes |
+| Shape | HakoDB op | Fair comparison | Notes |
 |---|---|---|---|
-| Owned full scan | decoded keyset pages | `SELECT *` + owned per-row copies | Accessor pokes alone measure borrowed buffers — copy to compare documents |
+| Owned full scan | decoded keyset pages | `SELECT *` + owned per-row copies | Copy documents on both sides |
 | Byte scan | `walk` / `hk_cursor_walk` | cursor + key movement | No decode on either side |
 | Lazy (few fields) | `walk_view` + pulls | narrow `SELECT` + accessor touches | Same fields, same count |
 | Point field | `viewGet` + typed getter | raw value fetch | No JSON on either side |
-| JSON serve | `hk_result_set_to_json` | `json_group_array(json_object(…))` | Never hand-rolled harness C; verify binary handling matches |
-| Deep pages | keyset `start_after` at depth D | `OFFSET D LIMIT 20` | The O(log N) vs O(N) duel |
+| JSON serve | `hk_result_set_to_json` | `json_group_array(json_object(…))` | Verify binary handling matches |
+| Deep pages | keyset `start_after` at depth D | `OFFSET D LIMIT 20` | Compares seek cost with skip cost |
 
-Anti-patterns that have bitten: paging raw result sets and calling it a scan comparison; full-JSON point-gets on binary values; warmed-vs-cold run-order effects (publish cold numbers or randomize order, and say which).
+Use the same document count, payload shape, field count, and durability mode on both sides. Run each shape at least three times and report the median; do not compare a cold run with a warm one. State whether the numbers are cold or warm.
 
 ## Official tools
 
-- `benchmark.cpp` — reference harness over the C ABI. Profiles across durability/workload mixes; `--gate` runs the median-of-3 regression gate (Manual) and settles before scan stages.
+- `benchmark.cpp` — reference harness over the C ABI. Profiles across durability and workload mixes; `--gate` runs the median-of-3 regression gate on the Manual profile.
 - `sqlite_bench.cpp` — SQLite mirror with the same stages, loop counts, math, and table geometry.
-- `cargo test` plus `tests/cursor_parity.rs` and `tests/codec_integrity.rs` — in-process numbers without FFI/JSON tax, with exact-count assertions.
-
-## Reference scoreboard
-
-10k complex docs, same box:
-
-| Scan | HakoDB | SQLite |
-|---|---|---|
-| Decoded fwd/rev | ~130–220k docs/s | ~430k docs/s (owned) |
-| Lazy (2–3 fields) | ~890k | ~1.1M |
-| Raw / key | ~6M | ~6–7M |
-
-Writes: sync (fsync) ~5x rivals; batch random ~3–5x MDBX. Point views: ~650k ops/s borrowed. Walk count-only ~3.3M (within ~10% of MDBX byte scans). These are ranges, not points: this box swings ±30% run to run, which is why the gate uses medians.
-
-## Variance sources
-
-- Box load and thermals (±30%): use medians and min/max over at least 3 runs, never best-of-1.
-- Unsettled background work: solved by `await_quiescent`.
-- Page-cache warmth: first-iteration effects show up in the gate's rep-0 slump.
-- `BTN`/Defender-style scanning of fresh binaries: first run after a rebuild.
-- Composite-path 2x run-to-run wobble: tracked; the gate absorbs it, root cause still open.

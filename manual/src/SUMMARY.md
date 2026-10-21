@@ -27,7 +27,7 @@
 - [Sync concepts](sync-concepts.md)
 - [Mesh sync (LAN)](sync-mesh.md)
 - [Cloud sync (central hub)](sync-cloud.md)
-- [Scaling writer pods](scaling.md)
+- [Scaling cloud sync](scaling.md)
 - [LAN relay](lan-relay.md)
 - [Socket sync (one box)](sync-socket.md)
 - [Sync encryption posture](sync-encryption.md)
@@ -51,11 +51,6 @@
 - [Benchmarking](benchmarking.md)
 - [MCP server](mcp.md)
 - [Balancer](balancer.md)
-
-# Internals
-
-- [Query planner study](query-planner.md)
-- [Codec perf baseline](perf-baseline.md)
 
 # Backend (hakobackend)
 

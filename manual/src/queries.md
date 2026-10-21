@@ -49,7 +49,7 @@ For a read-modify-write transaction, use `db.transaction(policy, |tx| ...)`: it 
 
 ## Explain
 
-`explain(query)` returns the `QueryPlan` that `query()` would execute. `explain_report(query)` returns a serializable, human-readable report. Neither executes the query. Both use the same admission check and plan-cache path as `query()`.
+`explain(query)` returns the `QueryPlan` that `query()` would execute. `explain_report(query)` returns a serializable, human-readable report. Neither executes the query. Both use the same planning path as `query()`.
 
 `ExplainReport` fields:
 
@@ -85,7 +85,7 @@ A covering read builds each projected value from the plan and reads no document.
 
 Ranges, unions, FTS, and vector scans are not covering for field projections; `id` alone can cover when the scan is index-backed and its filters/order are satisfied. A composite range can narrow candidates, but its plan reports the filter/order flags false, so it stays on the decode path. Traverse is excluded. Every projected path must be top-level (no dots); nested rebuild from an index prefix is still unsupported and falls back to decode. The same fallback applies when the projection includes any field the plan does not know.
 
-Covering applies to projected reads such as `query_projected_zero_copy` (and the projected FFI path); plain `query()` returns whole documents and therefore is not a covering read. The optimizer records this in `QueryPlan::covering_projection` in `src/query/plan.rs`.
+Covering applies to projected reads such as `query_projected_zero_copy` and the projected FFI path. Plain `query()` returns whole documents and is therefore not a covering read. The plan reports this as `covering`; there is no separate switch to enable it.
 
 ## How the planner thinks
 
@@ -95,10 +95,10 @@ Covering applies to projected reads such as `query_projected_zero_copy` (and the
 
 You don't pick the strategy; you shape the odds: index the fields you filter on (see [Indexes](indexes.md)). Unindexed queries are never wrong, just slower.
 
-For the measured planner behavior and open work, read the [query planner study](query-planner.md). For raw, borrowed, and paginated read paths, see [Reading data](reads.md); for aggregation stages, see [Pipelines](pipelines.md).
+For raw, borrowed, and paginated read paths, see [Reading data](reads.md). For aggregation stages, see [Pipelines](pipelines.md).
 
 ## Common mistakes
 
 - **Deep `offset` pagination.** `offset(100000)` still walks 100k rows. Use cursor bounds for infinite scroll.
-- **Filtering on unindexed fields in a hot loop, then blaming the engine.** Run `explain` first; add the index; re-run.
+- **Filtering on unindexed fields in a hot loop.** Run `explain` first; add the index; re-run.
 - **Assuming cross-type equality.** An `Int(1)` filter does not match a stored `String("1")` through exact-key index buckets — the engine falls back to a verified sweep for ambiguous classes, but keep stored types consistent.

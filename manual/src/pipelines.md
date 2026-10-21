@@ -101,5 +101,4 @@ Pipeline::new("docs").match_query(
 
 Once the rows are materialised, later stages cannot start a new vector or
 graph scan. Traverse hits are filtered to the queried collection; use the
-`find_paths` engine API for cross-collection paths. See
-`tests/issue71c_pipeline.rs` for the executable examples.
+`find_paths` engine API for cross-collection paths.

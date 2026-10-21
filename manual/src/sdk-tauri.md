@@ -1,6 +1,6 @@
 # Tauri SDK (Rust gateway + TypeScript client)
 
-Two halves: `hakotauri` (`0.4.11`, Rust gateway crate) exposes the engine as binary Tauri commands; `@hakodb/tauri` (`0.3.5`, `hakodb/hakotaurits`) calls them over `invoke` with MessagePack payloads and `onSnapshot` listeners. The gateway and client versions move together: the op enum in `src/tauri.ts` must match `HakoOp` in the Rust crate.
+Two halves: `hakotauri` (`0.4.11`, Rust gateway crate) exposes the engine as binary Tauri commands; `@hakodb/tauri` (`0.3.5`, `hakodb/hakotaurits`) calls them over `invoke` with MessagePack payloads and `onSnapshot` listeners. The gateway and client versions move together: the TypeScript op enum must match the Rust `HakoOp` enum.
 
 ```sh
 npm i @hakodb/tauri
