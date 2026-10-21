@@ -1,0 +1,13 @@
+#mdbook-menu-bar h1.menu-title a {
+  color: inherit;
+  text-decoration: none;
+}
+
+#mdbook-menu-bar h1.menu-title a:hover {
+  text-decoration: underline;
+}
+
+#mdbook-menu-bar h1.menu-title a:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}

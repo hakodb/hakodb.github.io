@@ -12,6 +12,8 @@ on:
       - "styles.css"
       - "assets/**"
       - "llms.txt"
+      - "robots.txt"
+      - "scripts/**"
       - ".github/workflows/docs.yml"
   workflow_dispatch:
 
@@ -39,9 +41,11 @@ jobs:
         run: |
           mkdir -p _site/docs
           cp -r manual/book/. _site/docs/
-          cp index.html styles.css llms.txt _site/
+          cp index.html styles.css llms.txt robots.txt _site/
           cp -r assets _site/
           touch _site/.nojekyll
+      - name: Add SEO metadata
+        run: python3 scripts/seo.py _site
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site

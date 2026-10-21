@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+Disallow: /docs/print.html
+Disallow: /docs/toc.html
+
+Sitemap: https://hakodb.github.io/sitemap.xml
