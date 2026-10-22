@@ -5,6 +5,8 @@ use hakodb::index::vector::Metric;
 
 db.create_vector_index("articles", "embedding", 384, Metric::Cosine)?;
 let hits: Vec<(String, HakoDoc)> = db.find_near("articles", "embedding", &query_vec, 10)?;
+
+db.drop_vector_index("articles", "embedding")?; // definition + graph
 ```
 
 Vectors are stored as binary little-endian `f32` arrays in a regular field. Search walks an HNSW graph and rescores exactly — nearest first.
