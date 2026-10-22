@@ -34,4 +34,8 @@ Each index create has a matching drop. All return `0` on success (including an a
 
 Composite ids come from `hk_engine_list_indexes`; an id owned by another collection is rejected instead of deleted. Document data is never touched.
 
+## Cloud status redaction
+
+`hk_cloud_sync_status` returns JSON without `room_key`, so it is safe to log or expose to an admin UI. Rust callers that need the key for trusted in-process use can still read `CloudStatus::room_key`; use `CloudSync::status_redacted()` for anything that leaves the process.
+
 SDK maintainers: regenerated headers live next to the binaries (`target/<…>/hakodb.h`); release bundles carry the header from the build that produced them.
