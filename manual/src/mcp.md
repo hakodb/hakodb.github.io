@@ -239,7 +239,7 @@ A minimal cloud pair:
 
 ## Persistence and recovery
 
-HakoDB writes through its WAL. A hard kill after a successful write is recovered on the next open; integration tests cover this. Durability is the engine's contract, not MCP's.
+HakoDB writes through its WAL. Call `flush` when you need a known durability point; a hard kill after a successful flush is recovered on the next open, and integration tests cover that path. Without a flush, durability follows the engine's WAL policy. Durability is the engine's contract, not MCP's.
 
 Backup and restore are deliberately outside `hakomcp`. Use `hakocli` or your operator tooling while the database is offline.
 
