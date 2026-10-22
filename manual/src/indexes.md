@@ -21,6 +21,28 @@ db.list_indexes(Some("users"));                             // inspect
 
 Index snapshots persist across restarts; after compaction or recovery the engine rewrites them automatically.
 
+## Dropping indexes
+
+Every create has a matching drop. Drops remove the definition and its RAM state, leave document data untouched, and are idempotent: dropping an absent index returns `Ok`. Read-only engines refuse them (same `ReadOnly` error as writes).
+
+```rust,ignore
+db.drop_index("users", "tenant")?;                 // secondary
+db.drop_fts_index("articles", "body")?;            // full-text
+db.drop_vector_index("articles", "embedding")?;    // vector + HNSW graph
+
+let id = db.list_indexes(Some("users")).composite[0].id;
+db.drop_composite_index("users", id)?;             // composite
+
+db.drop_traverse_index("docs")?;                   // stop incoming tracking
+db.drop_edge_index("rel")?;                        // _from/_to + tracking
+```
+
+- The composite id must belong to the named collection; a mismatch is `InvalidInput`, never a cross-collection delete.
+- Dropping a unique composite index releases its claim ledger immediately, so the old tuple can be inserted again.
+- `drop_edge_index` owns the `_from` and `_to` secondary indexes created by `create_edge_index`.
+- Index definitions persist, so a restart does not resurrect a dropped index.
+- **Synced deployments:** index definitions replicate additively. Drop on every member, otherwise a peer can recreate the index on the next def sync. Def tombstones are tracked in [hakodb#115](https://github.com/hakodb/hakodb/issues/115).
+
 ## Readiness and backfill
 
 Opening a database starts index recovery in the background. Separately, creating a secondary, full-text, vector, or **non-unique** composite index registers the definition and then backfills it on a background thread. While a collection's backfill is in flight, the planner treats that collection's index-backed plans as not ready and falls back to `FullCollection`. Two lanes have their own rules: the id-order `SortedKeys` slice stays available because it is index-independent, and vector lanes ignore pending writes (the executor live-filters deleted ids) but still wait for backfills to finish.

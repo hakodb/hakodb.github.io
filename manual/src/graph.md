@@ -18,6 +18,8 @@ let spec = TraverseSpec {
     weight_field: None,
 };
 let hits = db.find_paths("docs", "a", &spec)?;   // Vec<TraverseHit>
+
+db.drop_traverse_index("docs")?; // later: stop tracking incoming edges
 ```
 
 Each hit carries its depth from the start node. Depth is hard-capped at 32; visited sets keep cyclic graphs terminating.
@@ -37,6 +39,8 @@ let spec = TraverseSpec {
     weight_field: Some("w".into()),
 };
 let hits = db.find_paths("nodes", "a", &spec)?;  // cost-ordered, hits carry `cost`
+
+db.drop_edge_index("rel")?; // later: _from/_to indexes + tracking
 ```
 
 Missing or non-numeric weights count 1.0; negatives clamp to 0. Without `via_edge`, the same call runs unweighted BFS.
