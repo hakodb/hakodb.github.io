@@ -11,6 +11,7 @@ Every fallible call returns `Result<_, HakoError>`. The variants:
 | `IndexError` | Index operation failed | Building on a missing collection, bad definition. |
 | `Corrupt` | Fail-closed refusal | Denied access, out-of-range traverse depth, compressed payload on a compression-less build. |
 | `InvalidInput` | Bad argument | Empty ids, zero depth/limit, malformed reference. |
+| `Cancelled` | Cooperative cancellation requested | A `CancelToken` passed to a `*_with_cancel` method was cancelled. |
 
 Design rules behind them (these never change silently):
 

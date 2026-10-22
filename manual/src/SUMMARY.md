@@ -20,6 +20,7 @@
 - [Watch streams](watch.md)
 - [Durability, encryption, compression](durability.md)
 - [Backup and recovery](backup-recovery.md)
+- [Cancellation](cancellation.md)
 - [Errors and fail-closed rules](errors.md)
 
 # Sync
