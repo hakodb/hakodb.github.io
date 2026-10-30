@@ -53,8 +53,11 @@
 - [MCP server](mcp.md)
 - [Balancer](balancer.md)
 
-# Backend (hakobackend)
+# Agent engine (hakoagent)
 
+- [Agent engine (hakoagent)](hakoagent.md)
+
+# Backend (hakobackend)
 - [Backend overview](backend-overview.md)
 - [Backend quickstart](backend-quickstart.md)
 - [Backend configuration](backend-config.md)
