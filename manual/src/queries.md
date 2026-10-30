@@ -19,8 +19,9 @@ Operators: `Eq Ne Gt Gte Lt Lte In NotIn ArrayContains ArrayContainsAny Match Co
 // projection: fetch only the fields you touch (zero-copy from mapped bytes)
 let names = db.query(Query::new("users").select_fields(vec!["name".into()]))?;
 
-// aggregates without materializing rows
-let total = db.execute_aggregation(/* ... */)?;
+// aggregates without materializing rows (count, sum, avg, min, max)
+let count = db.execute_aggregation(Query::new("users").aggregate(AggregateOp::Count))?;
+let newest = db.execute_aggregation(Query::new("users").aggregate(AggregateOp::Min("age".into())))?;
 ```
 
 `explain(query)` returns the chosen plan (scan type, index usage) — the first tool when a query is slow.

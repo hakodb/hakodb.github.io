@@ -1,5 +1,9 @@
 # Operations
 
+## Deletes and retention
+
+Deletes are soft by default: the doc becomes invisible immediately, and the payload waits in a retention record until the sweeper purges it. The sweeper runs on a background cadence; you can also trigger a pass yourself from any SDK (`sweep_now`) and inspect the queue (`restore_available` / `delete_queue`). Retention length and the budget caps are plain `HakoConfig` fields — tune them to your recovery window. Vacuum purges tombstones for a collection explicitly (no sync traffic).
+
 ## Sizing
 
 - **Memory**: hot set lives mapped; size RAM for the working set, not the database. `memory_limits` caps the inlined-RAM tier; the rest spills to segments.

@@ -1,6 +1,6 @@
 # Cluster
 
-`hakocluster` (`hakodb/hakocluster`, currently `0.4.0`) is an in-process dispatcher over N `hakodb` instances sharing identical data (kept so by `socket_sync`): **reads fan out** across replicas, **writes route** to a single designated writer. Manual failover moves the writer (`promote` returns an epoch; re-promote is idempotent, and the fence stays the read-only flags). There is no automatic failover: promotion is always operator-driven.
+`hakocluster` (`hakodb/hakocluster`) is an in-process dispatcher over N `hakodb` instances sharing identical data (kept so by `socket_sync`): **reads fan out** across replicas, **writes route** to a single designated writer. Manual failover moves the writer (`promote` returns an epoch; re-promote is idempotent, and the fence stays the read-only flags). There is no automatic failover: promotion is always operator-driven.
 
 Scope: cluster, mesh, and replica only. Members are Hako data dirs; other engines are out of scope.
 

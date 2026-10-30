@@ -1,6 +1,6 @@
 # JavaScript / TypeScript SDK
 
-Package `@hakodb/client` (`hakodb/hakojs`, currently `0.5.22`). Two layers: a high-level Firestore-shaped client (`client.ts`) over native FFI bindings (`native.ts`; `koffi` on Node, Bun FFI on Bun).
+Package `@hakodb/client` (`hakodb/hakojs`). Two layers: a high-level Firestore-shaped client (`client.ts`) over native FFI bindings (`native.ts`; `koffi` on Node, Bun FFI on Bun).
 
 ```sh
 npm i @hakodb/client
@@ -9,8 +9,10 @@ npm i @hakodb/client
 `native.ts` loads the HakoDB cdylib. Resolution order: `loadNativeBindings(explicitPath)` → `HAKODB_LIB_PATH` env → `./native/<lib>`. Populate it with the repo's sync script:
 
 ```powershell
+# from a local core checkout (build it first: cargo build --release)
 .\sync-native.ps1 -CoreDir C:\Dev\libs\hakodb
-.\sync-native.ps1 -Tag v0.16.7
+# or from a core release (pass the tag you want)
+.\sync-native.ps1 -Tag <core-release-tag>
 ```
 
 Binaries under `native/` are git-ignored.
@@ -38,6 +40,7 @@ Notes:
 - Queries mirror Firestore spelling (`where`, `orderBy`, `limit`, `onSnapshot`) with HakoDB operators (`== != > >= < <= match matchPrefix contains startsWith in not-in array-contains array-contains-any`).
 - `HakoConfig` exposes durability/encryption/workers; `NetSyncer` and `CloudSync` classes wrap the sync planes; `Transaction` and `WriteBatch` mirror the engine.
 - References use `{__ref__: "collection/id"}`; graph and vector ops (`createTraverseIndex`, `findPaths`, `createEdgeIndex`, `shortestPaths`, `createVectorIndex`, `findNear`) are on the client.
+- Deletes are soft by default; `deleteEx(ref, force)` opts into a hard delete, and `restore` / `restoreAvailable` / `deleteQueue` / `sweepNow` wrap the retention surface on the client.
 
 ## Common mistakes
 

@@ -1,17 +1,19 @@
 # Go SDK
 
-Module `github.com/hakodb/hakogo` (package `hako`, repo `hakodb/hakogo`, currently `0.1.9`). cgo bindings over the C ABI with a fluent document layer.
+Module `github.com/hakodb/hakogo` (package `hako`, repo `hakodb/hakogo`). cgo bindings over the C ABI with a fluent document layer.
 
 Populate `third_party/` (canonical `hakodb.h` + platform binary) with the repo's sync script. Headers are committed; binaries under `third_party/lib/` are git-ignored. `go build`/`go vet` need a C compiler on `PATH` (MinGW gcc on Windows).
 
 ```powershell
+# from a local core checkout (build it first: cargo build --release)
 .\sync-core.ps1 -CoreDir C:\Dev\libs\hakodb
-.\sync-core.ps1 -Tag v0.16.7
+# or from a core release (pass the tag you want)
+.\sync-core.ps1 -Tag <core-release-tag>
 ```
 
 ```sh
 ./sync-core.sh --core-dir /path/to/hakodb
-./sync-core.sh --tag v0.16.7
+./sync-core.sh --tag <core-release-tag>
 ```
 
 ```go
@@ -37,6 +39,7 @@ Patterns:
 - Every handle (`Engine`, `Doc`, `Query`, `Batch`, `Config`, `Array`) has an explicit `Free`/`Close` — `defer` it at creation. No finalizers; leaks are silent.
 - Errors come back as Go `error` (check `err`, then `hako.LastError()` detail lives inside already).
 - Queries: `NewQuery(collection)` + `Where*` builders + `Execute`; graph via `CreateTraverseIndex`/`FindPaths`, `CreateEdgeIndex`/`ShortestPaths`; vector via `CreateVectorIndex`/`FindNear`.
+- Deletes are soft by default (restoreable until the sweeper purges the retention record); the retention surface is wrapped (`Restore`, `RestoreAvailableJSON`, `DeleteQueueJSON`, `SweepNow`) and force deletes are explicit.
 - Cross the boundary with JSON where convenient (`ownedCStringJSON` helpers) and handles where hot.
 
 ## Common mistakes

@@ -1,6 +1,6 @@
 # Backend overview
 
-`hakobackend` (`hakodb/hakobackend`, currently `0.9.0`) is a universal HTTP gateway: one Axum server speaks a Firestore-compatible wire protocol while **plug-and-play database drivers** do the storage. No database — including HakoDB — is bound to the core; every engine is an addon behind one trait.
+`hakobackend` (`hakodb/hakobackend`) is a universal HTTP gateway: one Axum server speaks a Firestore-compatible wire protocol while **plug-and-play database drivers** do the storage. No database — including HakoDB — is bound to the core; every engine is an addon behind one trait.
 
 ```
 clients (browser / phone / CLI / SDK)
