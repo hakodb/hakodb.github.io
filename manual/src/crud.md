@@ -27,8 +27,38 @@ db.put_subdocument("users", "1", "address", &addr_doc)?;
 
 Nested documents are plain values; subcollections (`put_subdocument`) are separate namespaces for when you need to query children independently.
 
+## Deleting
+
+Deletes are soft by default: the engine leaves a tombstone and keeps the payload in a retention record (`__hako_softdel`), so an accidental delete can be undone while it is still queued for the sweeper.
+
+```rust,ignore
+// SOFT DELETE (default): restoreable until the sweeper purges the record
+db.delete("users", "1")?;
+
+// HARD DELETE: bypass retention entirely (vacuum/sync paths keep this shape)
+db.delete_force("users", "1")?;
+
+// UNDO: re-create the doc at a fresh version; consumes the retention record
+db.restore("users", "1")?;
+
+// INSPECT: what is still restoreable / what the next sweep will purge
+let restoreable = db.restore_available(Some("users"))?; // None = every collection
+let due = db.delete_queue(Some("users"))?;
+let purged = db.sweep_now()?; // returns expired records purged now
+```
+
+Retention is configured on `HakoConfig`:
+
+| Field | Meaning |
+|---|---|
+| `soft_delete_retention_secs` | How long a soft-deleted doc stays restoreable (0 disables retention; deletes degrade to tombstone-only) |
+| `soft_delete_sweep_interval_secs` | Background sweeper cadence |
+| `soft_delete_max_bytes` / `soft_delete_max_count` | Retention budget caps |
+
+Batch deletes follow the same rule: `BatchMutation::SoftDelete` is the default shape, `BatchMutation::Delete` is the legacy hard delete kept for vacuum and sync paths.
+
 ## Common mistakes
 
 - **Expecting `put` to fail on existing ids.** It overwrites. Read-then-write races across threads need [transactions](transactions.md), not `put`.
 - **Storing the id only inside the document.** Key lookups use the key argument; keep them consistent.
-- **Deleting to "reset" test state.** Deletes tombstone; use a fresh directory for tests instead of deleting thousands of docs.
+- **Deleting to "reset" test state.** Deletes tombstone and keep a retention record; use a fresh directory for tests instead of deleting thousands of docs.

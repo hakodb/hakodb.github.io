@@ -1,6 +1,6 @@
 # Tauri SDK (Rust gateway + TypeScript client)
 
-Two halves: `hakotauri` (`0.4.11`, Rust gateway crate) exposes the engine as binary Tauri commands; `@hakodb/tauri` (`0.3.5`, `hakodb/hakotaurits`) calls them over `invoke` with MessagePack payloads and `onSnapshot` listeners. The gateway and client versions move together: the TypeScript op enum must match the Rust `HakoOp` enum.
+Two halves: `hakotauri` (Rust gateway crate) exposes the engine as binary Tauri commands; `@hakodb/tauri` (`hakodb/hakotaurits`) calls them over `invoke` with MessagePack payloads and `onSnapshot` listeners. The gateway and client move together: the TypeScript op enum must match the Rust `HakoOp` enum.
 
 ```sh
 npm i @hakodb/tauri
@@ -53,6 +53,7 @@ Notes:
 - Sync planes are opt-in features on the gateway (`net-sync`, `cloud-sync`, `socket-sync`): enable what the app needs; the TS side calls the same sync ops.
 - `flushDatabase` / `listStorageKeys` cover the consumer ops (durability control, storage inspection).
 - Graph and vector ops are wired through (`createTraverseIndex`, `findPaths`, `createEdgeIndex`, `findNear`).
+- Deletes are soft by default: the `delete` op takes `force: true` for a hard delete, batch delete items carry per-item `force`, and `restore` / `restore_available` / `delete_queue` / `sweep` ops cover the retention surface (records come back under the `records` key).
 
 ## Common mistakes
 

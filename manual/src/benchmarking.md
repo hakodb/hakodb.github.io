@@ -1,6 +1,6 @@
 # Benchmarking HakoDB
 
-The official harnesses live in `hakodb/hakobench` (currently `0.1.1`). Run them locally against a core checkout or a release asset. Two rules matter: **settle background work before measuring**, and **compare equal work**.
+The official harnesses live in `hakodb/hakobench`. Run them locally against a core checkout or a release asset. Two rules matter: **settle background work before measuring**, and **compare equal work**.
 
 ## Build (Windows, MinGW)
 

@@ -2,8 +2,8 @@
 
 ```sh
 # 1. Fetch the static binary (runs on EL7/EL8/ubuntu/Alpine alike)
-curl -LO https://github.com/hakodb/hakobackend/releases/download/v0.9.0/hakobackend-v0.9.0-linux-x86_64.tar.gz
-tar xzf hakobackend-v0.9.0-linux-x86_64.tar.gz
+gh release download --repo hakodb/hakobackend --pattern '*linux-x86_64.tar.gz' --clobber
+tar xzf hakobackend-*.tar.gz
 
 # 2. Minimal config (dev only: no policy file = OPEN + WARN)
 printf 'port = 3000\ndriver = "hako"\ndata = "./data"\n' > hakobackend.toml

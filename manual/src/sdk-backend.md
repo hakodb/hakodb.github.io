@@ -1,6 +1,6 @@
 # HTTP backend (hakobackend)
 
-`hakodb/hakobackend` (currently `0.9.0`) is the universal HTTP gateway: Axum server + plug-and-play database drivers (`hako` included), Firestore-compatible wire protocol, auth providers (local, Firebase, GitHub, OIDC, custom), collection policy rules, rate limits, file uploads, and realtime WebSocket/SSE streams. Use it when clients are browsers or phones that can't embed the engine.
+`hakodb/hakobackend` is the universal HTTP gateway: Axum server + plug-and-play database drivers (`hako` included), Firestore-compatible wire protocol, auth providers (local, Firebase, GitHub, OIDC, custom), collection policy rules, rate limits, file uploads, and realtime WebSocket/SSE streams. Use it when clients are browsers or phones that can't embed the engine.
 
 Wire contract: `GET /api/health`, `GET /api/ready`, CRUD under `/api/collections/{path}`, `POST /api/indexes`, `GET /ws`, `GET /api/stream/{collection}`, `POST /api/files/…`. Full contract: `HTTP_CONTRACT.md` in the backend repo; auth: `AUTH_CONTRACT.md`; policy: `SECURITY_RULES.md` + `policy.standard.toml`.
 

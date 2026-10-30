@@ -1,6 +1,6 @@
 # MCP server (hakomcp)
 
-`hakomcp` (currently `0.2.0`) is a [Model Context Protocol](https://modelcontextprotocol.io) server over stdio. It opens one local HakoDB database and gives an agent a task-level control plane for documents, queries, indexes, change observation, maintenance jobs, and engine-native sync.
+`hakomcp` is a [Model Context Protocol](https://modelcontextprotocol.io) server over stdio. It opens one local HakoDB database and gives an agent a task-level control plane for documents, queries, indexes, change observation, maintenance jobs, and engine-native sync.
 
 It is not a replacement for `hakocli`. `hakocli` is the debugging and operations CLI for humans and scripts. `hakomcp` is the long-lived process an agent talks to. Replication stays in the HakoDB engine: MCP starts and observes sync, it does not relay documents itself.
 
@@ -28,7 +28,7 @@ hakomcp --db ./my-data --profile data
 | `--db PATH` | Database directory (default `./hakomcp-data`). |
 | `--profile read\|data\|sync\|admin` | Capability profile (default `data`). |
 | `--allow-network` | Allow sync listeners. Required by `--profile sync`. |
-| `--allow-destructive` | Allow real `documents_delete_where` deletion. |
+| `--allow-destructive` | Allow real `documents_delete_where` deletion, and `force` (hard) deletes. |
 | `--subscribe-to LIST` | Collection allowlist for change notifications and watches. |
 | `--collection-allow LIST` | Only these collections are visible; trailing `*` is supported. |
 | `--collection-deny LIST` | Hide these collections; trailing `*` is supported. |
@@ -60,7 +60,7 @@ Tools outside the active profile are absent from `tools/list` and rejected at ca
 | `read` | Reads, queries, aggregates, query plans, indexes, stats, watches, jobs inspection. |
 | `data` | Everything in `read`, plus document writes, batches, index creation, and schema changes. |
 | `sync` | Everything in `data`, plus sync start/stop/status. Requires `--allow-network`. |
-| `admin` | Everything, plus destructive deletes, compaction, vacuum, flush, and job cancellation. |
+| `admin` | Everything, plus destructive deletes, compaction, vacuum, flush, sweep, and job cancellation. |
 
 Use `read` for retrieval agents, `data` for application agents, `sync` for a node controller, and `admin` only for trusted operators.
 
@@ -75,15 +75,21 @@ Canonical names are listed below. The original aliases `get`, `put`, `query`, `c
 | `document_get` | `collection`, `id` | `{found, document}` |
 | `document_put` | `collection`, `doc`, `id?`, `vectors?` | `{ok, collection, id}` |
 | `document_patch` | `collection`, `id`, `updates` | `{ok, collection, id}` |
-| `document_delete` | `collection`, `id` | `{ok, collection, id}` |
+| `document_delete` | `collection`, `id`, `force?` (hard delete; soft is the default) | `{ok, collection, id}` |
 | `document_batch` | `mutations` | `{ok, count, ids}` |
+| `document_restore` | `collection`, `id` | `{ok, collection, id, document}` |
+| `document_restore_available` | `collection?` (omitted = every collection) | retention records |
+| `documents_delete_queue` | `collection?` (omitted = every collection) | records due for sweep |
+| `sweep` | - | `{purged: count}` (admin profile) |
 | `collection_list` | - | collections with counts |
 | `collection_describe` | `collection` | fields, schema, and counts |
 | `collection_stats` | `collection` | engine collection statistics |
 | `schema_set` | `collection`, `schema` | `{ok, collection}` |
 | `schema_clear` | `collection` | `{ok, collection}` |
 
-`mutations` is an array of `{op: "put", collection, id?, doc}`, `{op: "patch", collection, id, updates}`, or `{op: "delete", collection, id}`. A batch is atomic.
+`mutations` is an array of `{op: "put", collection, id?, doc}`, `{op: "patch", collection, id, updates}`, or `{op: "delete", collection, id, force?}`. Deletes are soft by default; a per-mutation `force: true` purges immediately (requires `--allow-destructive`). A batch is atomic.
+
+Deletes are restoreable: soft-deleted docs stay in the retention queue until the sweeper purges them (`document_restore` brings one back; `document_restore_available` / `documents_delete_queue` list what is queued).
 
 A vector field is binary LE `f32[]` in the engine, which JSON cannot express directly. `vectors` takes a map of field to number array and encodes it; entries override same-named `doc` fields.
 
@@ -141,9 +147,7 @@ Jobs and sync are pull-only in this release. Poll `job_get` or read the job reso
 | `documents_delete_where` | `admin` | `collection`, filters, `dry_run` (boolean) |
 | `server_status` | all | - |
 
-Always call `documents_delete_where` with `"dry_run": true` first. A real deletion requires both `"dry_run": false` and `--allow-destructive`; it runs as a job.
-
-### Sync
+Always call `documents_delete_where` with `"dry_run": true` first. A real deletion requires both `"dry_run": false` and `--allow-destructive`; it runs as a job.### Sync
 
 | Tool | Arguments | Result |
 |---|---|---|

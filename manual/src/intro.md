@@ -2,7 +2,7 @@
 
 HakoDB is an embedded document database: a library you link into your process, not a server you operate. It stores typed JSON-like documents, queries them with filters/ordering/cursors, and optionally replicates them over LAN or a cloud hub.
 
-> Tested against `hakodb 0.16.7`. API shown is the Rust engine; other languages reach the same engine through the [C ABI](sdk-c-abi.md) and per-language SDKs.
+> The Rust engine API is shown here; other languages reach the same engine through the [C ABI](sdk-c-abi.md) and per-language SDKs.
 
 ## Five-minute quickstart
 

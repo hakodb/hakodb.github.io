@@ -1,12 +1,14 @@
 # Pascal SDK (Lazarus / Free Pascal)
 
-`hakodb/hakopascal` (currently `0.1.10`). Two units plus design-time components: `HakoRaw.pas` (direct `cdecl` imports from `hakodb.dll`), `Hako.pas` (friendly wrapper), `HakoCluster.pas` (cluster unit), installable `HakoComponent`/`HakoDesign` packages.
+`hakodb/hakopascal`. Two units plus design-time components: `HakoRaw.pas` (direct `cdecl` imports from `hakodb.dll`), `Hako.pas` (friendly wrapper), `HakoCluster.pas` (cluster unit), installable `HakoComponent`/`HakoDesign` packages.
 
 Put `hakodb.dll` next to your binary, on `PATH`, or under `./native/`. Populate `native/` with the sync script; binaries there are git-ignored:
 
 ```powershell
+# from a local core checkout (build it first: cargo build --release)
 .\sync-native.ps1 -CoreDir C:\Dev\libs\hakodb
-.\sync-native.ps1 -Tag v0.16.7
+# or from a core release (pass the tag you want)
+.\sync-native.ps1 -Tag <core-release-tag>
 ```
 
 The wrapper ships as two Lazarus packages, the standard runtime/designtime split:
@@ -40,6 +42,7 @@ Notes:
 - `hakodb.dll` (64-bit) must sit next to the executable or on `PATH`; `native/` in the repo carries the current pair (`hakodb.dll` + `hakocluster.dll`).
 - Same rule as Go: every created handle is freed explicitly — `try/finally` is the pattern, not an option.
 - References, graph (`CreateTraverseIndex`/`FindPaths`, `CreateEdgeIndex`/`ShortestPaths`), and vector (`CreateVectorIndex`/`FindNear`) mirror the C ABI one-to-one; when in doubt, `HakoRaw.pas` shows the exact import signature.
+- Deletes are soft by default (`Doc(...).Restore` undoes while the record is queued); `RestoreAvailable`, `DeleteQueue`, and `SweepNow` expose the retention surface.
 
 ## Common mistakes
 

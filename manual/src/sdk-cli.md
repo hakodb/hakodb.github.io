@@ -1,17 +1,6 @@
 # CLI (hakocli)
 
-`hakocli` (currently `0.2.8`) is the command-line manager for any HakoDB database: document CRUD, queries, indexes, watch streams, and LAN/cloud sync management. It is the fastest way to inspect, seed, and operate a database file without writing code.
-
-## Compatibility
-
-| hakocli | hako core |
-|---|---|
-| 0.2.2 | `hakodb 0.8.23+` |
-| 0.2.4 | `hakodb 0.12.2` (relocate/load/unload/unloaded archive commands) |
-| 0.2.5 | `hakodb 0.12.4` |
-| 0.2.6 | `hakodb 0.13+` (`vector create` + `vector search` KNN commands) |
-| 0.2.7 | `hakodb 0.14+` (`traverse create` + `traverse paths` graph BFS commands) |
-| 0.2.8 | `hakodb 0.15+` (`traverse create-edge` + `--via`/`--weight` Dijkstra) |
+`hakocli` is the command-line manager for any HakoDB database: document CRUD, queries, indexes, watch streams, and LAN/cloud sync management. It is the fastest way to inspect, seed, and operate a database file without writing code.
 
 ## Install
 
@@ -103,10 +92,19 @@ hakocli --db ./demo.db query users --fts description:seeded
 hakocli --db ./demo.db query users --where description:matchPrefix:seed
 hakocli --db ./demo.db query users --select name,age
 
-# aggregates
+# aggregates (count, sum, avg, min, max)
 hakocli --db ./demo.db aggregate users count
 hakocli --db ./demo.db aggregate users sum --field age --where active:eq:true
 hakocli --db ./demo.db query users --aggregate count --aggregate avg:age
+hakocli --db ./demo.db query users --aggregate min:age --aggregate max:age
+
+# soft delete, restore, and the retention queue
+hakocli --db ./demo.db delete users/alice          # soft (restoreable until swept)
+hakocli --db ./demo.db delete users/alice --force  # hard (no restore)
+hakocli --db ./demo.db restore-available users     # list restoreable docs
+hakocli --db ./demo.db restore users/alice         # undo the delete
+hakocli --db ./demo.db delete-queue                # what the next sweep will purge
+hakocli --db ./demo.db sweep                       # purge expired records now
 
 # mass update / mass delete from a query
 hakocli --db ./demo.db query users --where status:eq:trial --set --data '{"tier":"pro"}'
