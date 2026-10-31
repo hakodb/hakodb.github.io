@@ -116,6 +116,24 @@ hakocli --db ./demo.db index create-composite users --fields age:asc,name:asc
 hakocli --db ./demo.db index create-fts users description
 hakocli --db ./demo.db index list users
 
+# graph: create the tracker BEFORE writing edges (backlinks track new
+# writes only); walk BFS/Dijkstra/simple paths with route projections
+# and hop filters. Nodes/edges must carry Reference values.
+hakocli --db ./demo.db traverse create links
+hakocli --db ./demo.db traverse create-edge follows
+hakocli --db ./demo.db traverse paths links dan --direction incoming --include-path --include-via
+hakocli --db ./demo.db traverse paths links alice --via follows --weight w --simple --node-match 'status:vip' --edge-match 'rel:follows'
+hakocli --db ./demo.db traverse drop links
+hakocli --db ./demo.db traverse drop-edge follows
+
+# vector: {"field":{"__f32__":[...]}} ingests the Binary LE-f32 carrier;
+# KNN rides the near filter (k = --limit) or the explicit search command
+hakocli --db ./demo.db vector create docs emb 384 --metric cosine
+hakocli --db ./demo.db set docs/d1 --data '{"title":"x","emb":{"__f32__":[0.1,0.2]}}'
+hakocli --db ./demo.db query docs --where "emb:near:[0.1,0.2]" --limit 5
+hakocli --db ./demo.db vector search docs emb --query 0.1,0.2 --k 5
+hakocli --db ./demo.db vector drop docs emb
+
 # real-time watch (blocks and prints change events until Ctrl+C)
 hakocli --db ./demo.db watch users
 
@@ -129,7 +147,7 @@ hakocli --db ./demo.db rest GET users/alice
 hakocli --db ./demo.db rest PATCH users/alice --data '{"age":32}'
 ```
 
-Query filter syntax is `field:op:value`, where `op` is one of `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `in`, `notIn`, `match`, `matchPrefix`, `contains`, `startsWith`, `arrayContains`, `arrayContainsAny`. Array values use JSON, e.g. `tags:in:["a","b"]`. Ordering uses `field:asc` / `field:desc`. `match` runs a full-text (inverted-index) word search; `matchPrefix` is autocomplete-style prefix search over the same index (e.g. `"indom"` matches `"indomie"`).
+Query filter syntax is `field:op:value`, where `op` is one of `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `in`, `notIn`, `match`, `matchPrefix`, `contains`, `startsWith`, `arrayContains`, `arrayContainsAny`, `near`, `traverse`. Array values use JSON, e.g. `tags:in:["a","b"]`. Ordering uses `field:asc` / `field:desc`. `match` runs a full-text (inverted-index) word search; `matchPrefix` is autocomplete-style prefix search over the same index (e.g. `"indom"` matches `"indomie"`). `near` runs KNN over a vector index (the query vector is a JSON float array; k rides `--limit`); `traverse` is the graph-scan marker (`id`, `dir` 0/1/2, optional `edge`, `depth`).
 
 On Windows PowerShell 5.1, inline JSON passed to `--data` loses its inner double quotes when invoking native executables. Use `--fromfile payload.json` or `cmd.exe` instead.
 
