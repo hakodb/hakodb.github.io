@@ -62,7 +62,8 @@ __backend/service  {"keys": ["<key>"], "allow": ["coll:read"]}
 Rules of the road:
 
 - **A DB section that is present and valid wins over the file for that section**; the file stays the bootstrap source and untouched sections keep their file values. The driver/path, listen address and the auth chain itself stay file/env-only — the database cannot hold its own connection info.
-- **Manage via the admin API** (the `__` prefix is never addressable on the data plane): `GET/PUT /api/admin/backend/{policy|aliases|service}` — PUT validates first (policy parse, alias compile), then apply with `POST /api/admin/reload`.
+- **Manage via the admin API** (the `__` prefix is never addressable on the data plane): `GET/PUT/DELETE /api/admin/backend/{policy|aliases|service}` — PUT validates first (policy parse, alias compile), then apply with `POST /api/admin/reload`. Every call is audited (`admin.backend` events).
+- **Rollback**: `DELETE` a section, reload — the config file's value for that section takes over again (404 = the section was never set).
 - **Fail-closed**: a malformed section is rejected at PUT time; a bad section found at reload fails the reload with 400 and the old config is fully retained. A database without `__backend` is silent — the file keeps everything.
 - **Policy from DB is reload-driven**: once adopted, the policy file's per-request watch is disabled and the `__backend/policy` doc owns the policy until the next reload says otherwise. The DB policy's `[identity]` feeds provider construction like the file one.
 - **`admin_uids` stays file-only** — a DB-carried policy must not be able to make itself admin; secrets stay env-only.
