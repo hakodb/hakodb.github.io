@@ -1,6 +1,6 @@
 # Backend configuration
 
-Precedence: **CLI flags > config file > defaults** (`--help` lists all flags). Start from `hakobackend.example.toml`.
+Precedence: **CLI flags > config file > defaults** (`--help` lists all flags), except where the reserved `__backend` collection carries a section — see [Config from the database](#config-from-the-database) below. Start from `hakobackend.example.toml`.
 
 ```toml
 host = "0.0.0.0"
@@ -46,8 +46,26 @@ Notes:
 
 - **Co-located SQL over unix socket** (lower overhead than TCP): postgres `data = "postgres://user:pass@%2Fvar%2Frun%2Fpostgresql/dbname"`, mysql with `?socket=...`.
 - **Multidatabase**: `[databases]` adds named DBs (`?db=` on every route); `data` is always `default`. Policy uses dotted names (`akademik.mahasiswa`, quoted in TOML).
-- **Reload vs restart**: `POST /api/admin/reload` (admin UIDs only) picks up DB/auth/policy/limits/indexes. Port/listen/TLS/socket changes need a restart.
+- **Reload vs restart**: `POST /api/admin/reload` (admin UIDs only) picks up DB/auth/policy/limits/indexes — and the `__backend` config sections (below). Port/listen/TLS/socket changes need a restart.
 - **Secrets never live in config files**: provider params via env (`UB_LOCAL_JWT_SECRET` min 32 chars, `UB_FIREBASE_PROJECT`, `UB_OIDC_ISSUER`, …).
+
+## Config from the database
+
+Policy, path aliases and service keys can live as docs in a reserved `__backend` collection in the default database — editable at runtime through the admin API, no file edit per change. One doc per section:
+
+```
+__backend/policy   {"toml": "<policy.toml content>"}
+__backend/aliases  {"decl": [{"pattern": "/api/alias/x/:id", "target_path": "/api/collections/x", "target_query": ""}]}
+__backend/service  {"keys": ["<key>"], "allow": ["coll:read"]}
+```
+
+Rules of the road:
+
+- **A DB section that is present and valid wins over the file for that section**; the file stays the bootstrap source and untouched sections keep their file values. The driver/path, listen address and the auth chain itself stay file/env-only — the database cannot hold its own connection info.
+- **Manage via the admin API** (the `__` prefix is never addressable on the data plane): `GET/PUT /api/admin/backend/{policy|aliases|service}` — PUT validates first (policy parse, alias compile), then apply with `POST /api/admin/reload`.
+- **Fail-closed**: a malformed section is rejected at PUT time; a bad section found at reload fails the reload with 400 and the old config is fully retained. A database without `__backend` is silent — the file keeps everything.
+- **Policy from DB is reload-driven**: once adopted, the policy file's per-request watch is disabled and the `__backend/policy` doc owns the policy until the next reload says otherwise. The DB policy's `[identity]` feeds provider construction like the file one.
+- **`admin_uids` stays file-only** — a DB-carried policy must not be able to make itself admin; secrets stay env-only.
 
 ## Common mistakes
 

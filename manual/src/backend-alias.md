@@ -14,6 +14,7 @@ query = "options={...{sid}...{pin}...}"
 - The rewritten request re-enters routing, so auth, policy, limits, and realtime see the **target** exactly like a direct call — one rule surface.
 - Load-time guards refuse to boot on: pattern not under `/api/alias/`, target outside `/api/` or chaining into `/api/alias/`, unresolvable `{name}`, duplicates. Realtime lanes (`/ws`, `/api/stream/*`) cannot be targets.
 - No match = empty 404, same as an unknown route.
+- Aliases can also live in the `__backend/aliases` doc (see [configuration](backend-config.md#config-from-the-database)) — a valid DB section replaces the file's declarations at reload; the same load-time guards apply.
 
 ## Common mistakes
 
