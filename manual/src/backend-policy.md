@@ -1,11 +1,11 @@
 # Backend policy
 
-One global file (`policy.toml`, hot-reloaded), evaluated on collection names for every verb. Copy `policy.standard.toml`, then open per collection.
+One global file (`policy.toml`, hot-reloaded), evaluated on collection names for every verb. Copy `policy.standard.toml`, then open per collection. The policy can also live in the `__backend/policy` doc instead of the file — see [config from the database](backend-config.md#config-from-the-database).
 
 ```toml
 [identity]
 users_collection = "users"     # free choice; attrs below ride token claims
-attrs = ["role", "department"] # local-issuer only (see caveat)
+attrs = ["role", "department"] # ride token claims; see claim sources below
 
 [defaults]
 read = "deny"
@@ -30,7 +30,7 @@ Resolution: method slot → alias read/write → exact collection → root segme
 
 Rule vocabulary: `public` (anyone), `auth` (any authenticated caller), `deny` (nobody), `claim:role=editor` / `claim:uid=self` (token claims), `fields:unit=auth.unit,score=int:0..100` (scoped + typed writes). Admin = caller UID in server `admin_uids` — UIDs, not roles. `__`-prefixed collections are never addressable over HTTP.
 
-Claim caveat: `[identity].attrs` mint into tokens **only via the local issuer**. External providers (firebase/github/oidc) never mint user-doc attrs — `claim:` rules on them silently deny (boot warns). Those deployments put roles in JWT custom claims instead.
+Where attrs come from: the `local` issuer mints the allowlisted fields into the token at login/refresh. External providers (firebase/github/oidc) verify only — their callers get the fields either as IDP custom claims (minted by the identity provider) or via server-side enrichment: the allowlisted fields are read from the caller's user doc in `users_collection` (keyed by the namespaced uid) after verify, and a doc field overrides its token counterpart. No doc = no enrichment. A short TTL cache applies doc edits within a minute, no re-issue. Either way `claim:` rules match the same `Claims.extra` surface.
 
 Error contract: policy reject is always `403 Permission denied by policy` — never which rule failed. Missing doc 404, wrong route kind 400, duplicate `already-exists`, rate-limit 429.
 
