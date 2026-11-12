@@ -24,3 +24,4 @@ After an unclean shutdown, expect the first `open` to take longer (replay + veri
 - **Backing up individual files.** The directory is the unit. Cherry-picking `*.dat` without the WAL loses recent commits.
 - **Restoring over a running database.** Stop the process, replace the directory, start. Live restores corrupt both copies.
 - **`vacuum` confused with backup.** `vacuum_collection` purges tombstones to reclaim space — it is maintenance, not a safety copy.
+- **Restoring a backend database and forgetting `__backend`.** A backend's default database carries its config sections as `__backend` docs (policy, aliases, service keys) — a restore silently resurrects the config from backup time. After a restore, check those sections (or re-`PUT` them) before reloading.
