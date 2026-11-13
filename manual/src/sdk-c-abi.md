@@ -39,3 +39,5 @@ Composite ids come from `hk_engine_list_indexes`; an id owned by another collect
 `hk_cloud_sync_status` returns JSON without `room_key`, so it is safe to log or expose to an admin UI. Rust callers that need the key for trusted in-process use can still read `CloudStatus::room_key`; use `CloudSync::status_redacted()` for anything that leaves the process.
 
 SDK maintainers: regenerated headers live next to the binaries (`target/<…>/hakodb.h`); release bundles carry the header from the build that produced them.
+
+Header generation runs only when hakodb itself is the build target (this workspace, release/tag CI). Rust applications that depend on hakodb skip it automatically — no environment variable or feature needed, and dependent builds are a few seconds faster per cold tree. The manual override `HAKODB_SKIP_CBINDGEN=1` exists for hakodb's own dev loops (it skips regeneration even on hakodb builds); set it per-invocation, not globally, or building hakodb itself stops producing headers.
