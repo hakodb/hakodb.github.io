@@ -5,7 +5,7 @@
 Put `hakodb.dll` next to your binary, on `PATH`, or under `./native/`. Populate `native/` with the sync script; binaries there are git-ignored:
 
 ```powershell
-# from a local core checkout (build it first: cargo build --release)
+# from a local core checkout (build it first: cargo build --release --features header)
 .\sync-native.ps1 -CoreDir C:\Dev\libs\hakodb
 # or from a core release (pass the tag you want)
 .\sync-native.ps1 -Tag <core-release-tag>

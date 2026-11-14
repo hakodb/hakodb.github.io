@@ -9,7 +9,7 @@ npm i @hakodb/client
 `native.ts` loads the HakoDB cdylib. Resolution order: `loadNativeBindings(explicitPath)` → `HAKODB_LIB_PATH` env → `./native/<lib>`. Populate it with the repo's sync script:
 
 ```powershell
-# from a local core checkout (build it first: cargo build --release)
+# from a local core checkout (build it first: cargo build --release --features header)
 .\sync-native.ps1 -CoreDir C:\Dev\libs\hakodb
 # or from a core release (pass the tag you want)
 .\sync-native.ps1 -Tag <core-release-tag>
