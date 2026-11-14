@@ -5,7 +5,7 @@ Module `github.com/hakodb/hakogo` (package `hako`, repo `hakodb/hakogo`). cgo bi
 Populate `third_party/` (canonical `hakodb.h` + platform binary) with the repo's sync script. Headers are committed; binaries under `third_party/lib/` are git-ignored. `go build`/`go vet` need a C compiler on `PATH` (MinGW gcc on Windows).
 
 ```powershell
-# from a local core checkout (build it first: cargo build --release)
+# from a local core checkout (build it first: cargo build --release --features header)
 .\sync-core.ps1 -CoreDir C:\Dev\libs\hakodb
 # or from a core release (pass the tag you want)
 .\sync-core.ps1 -Tag <core-release-tag>

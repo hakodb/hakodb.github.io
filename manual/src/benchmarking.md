@@ -4,7 +4,7 @@ The official harnesses live in `hakodb/hakobench`. Run them locally against a co
 
 ## Build (Windows, MinGW)
 
-`HAKODB_DIR` points at a core checkout (default `../hakodb`). `-I` takes the core's release directory because `build.rs` generates `hakodb.h` next to the binaries.
+`HAKODB_DIR` points at a core checkout (default `../hakodb`). `-I` takes the core's release directory because the core's build generates `hakodb.h` next to the binaries when built with the `header` feature (`cargo build --release --features header`; plain builds skip header generation).
 
 ```powershell
 $env:HAKODB_DIR = "C:\Dev\libs\hakodb"
