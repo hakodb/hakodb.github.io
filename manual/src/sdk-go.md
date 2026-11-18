@@ -38,7 +38,7 @@ Patterns:
 
 - Every handle (`Engine`, `Doc`, `Query`, `Batch`, `Config`, `Array`) has an explicit `Free`/`Close` — `defer` it at creation. No finalizers; leaks are silent.
 - Errors come back as Go `error` (check `err`, then `hako.LastError()` detail lives inside already).
-- Queries: `NewQuery(collection)` + `Where*` builders + `Execute`; graph via `CreateTraverseIndex`/`FindPaths`, `CreateEdgeIndex`/`ShortestPaths`; vector via `CreateVectorIndex`/`FindNear`.
+- Queries: `NewQuery(collection)` + `Where*` builders + `Execute`; graph via `CreateTraverseIndex`/`FindPaths`, `CreateEdgeIndex`/`ShortestPaths`, plus `Subgraph`/`SubgraphProjected` (keep-list node projection); vector via `CreateVectorIndex`/`FindNear` and the filtered/scored variants (`HybridSearchFiltered`, `FindNearScoredFiltered`). `OpenExclusive` refuses a second writable engine on one data dir; `EnsureIndexes` declares the boot schema in one idempotent call.
 - Deletes are soft by default (restoreable until the sweeper purges the retention record); the retention surface is wrapped (`Restore`, `RestoreAvailableJSON`, `DeleteQueueJSON`, `SweepNow`) and force deletes are explicit.
 - Cross the boundary with JSON where convenient (`ownedCStringJSON` helpers) and handles where hot.
 

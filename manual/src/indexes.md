@@ -21,6 +21,22 @@ db.list_indexes(Some("users"));                             // inspect
 
 Index snapshots persist across restarts; after compaction or recovery the engine rewrites them automatically.
 
+## Declare the schema once at boot
+
+Services that own their collections usually want the whole index surface declared in one place before the first write. `ensure_indexes` is that surface — one idempotent call:
+
+```rust,ignore
+use hakodb::engine::IndexSchema;
+
+db.ensure_indexes(&IndexSchema {
+    fts: vec![("articles".into(), "body".into())],
+    vector: vec![("articles".into(), "embedding".into(), 384, Metric::Cosine)],
+    tracked: vec!["docs".into()],            // traverse (graph) tracking
+})?;
+```
+
+Re-running it with identical definitions is a cheap no-op that never wipes populated indexes. Re-declaring an existing index with a **different** definition (metric, dim, field) is refused loudly — drop the index first. The per-family `create_*` calls above remain for dynamic or one-off creation; sync note below applies either way.
+
 ## Dropping indexes
 
 Every create has a matching drop. Drops remove the definition and its RAM state, leave document data untouched, and are idempotent: dropping an absent index returns `Ok`. Read-only engines refuse them (same `ReadOnly` error as writes).

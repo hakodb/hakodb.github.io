@@ -19,6 +19,20 @@ Conventions every binding follows:
 - **Panics don't cross.** A bad call reports through `hk_last_error`; the process survives.
 - **Sync functions exist only in full builds.** Minimal (`--no-default-features`) DLLs lack the sync symbols — linking against them fails at load time, loudly, by design.
 
+## Open, boot schema, and filtered search
+
+Five symbols round out the write-path and search surface:
+
+| Function | Behavior |
+|---|---|
+| `hk_engine_open_exclusive(path)` | open holding an advisory data-dir lock; a second writable holder gets null + `hk_last_error()` (plain `hk_engine_open` keeps caller-owned semantics) |
+| `hk_engine_ensure_indexes(engine, schema_json)` | declare the whole boot schema (fts/vector/tracked) in one idempotent call; identical re-declaration is a no-op, a conflicting one fails loudly |
+| `hk_engine_hybrid_search_filtered(…, filters_json)` | hybrid text+vector search with admission filters before rank truncation; `null` = unfiltered |
+| `hk_engine_find_near_scored_filtered(…, max_distance, filters_json)` | scored KNN (raw distance, lower = better) with a distance cap (NaN/≤ 0 = none) and admission filters |
+| `hk_engine_subgraph_json_projected(…, fields_json)` | seed-scoped subgraph export with a node-field keep-list; `null`/`[]` = full docs |
+
+The headers are append-only, so older bindings keep compiling against newer libraries; calling a new symbol against an older runtime fails at load time, loudly.
+
 ## Index drops
 
 Each index create has a matching drop. All return `0` on success (including an absent target — drops are idempotent) and `-1` with `hk_last_error()` on failure, such as a read-only engine.

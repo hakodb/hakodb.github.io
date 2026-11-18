@@ -39,7 +39,7 @@ Notes:
 - `open(path, options?)` loads `native/hakodb.dll` (shipped) or `options.libraryPath` / `HAKODB_LIB_PATH`. A failed open throws with `native.lastError()`.
 - Queries mirror Firestore spelling (`where`, `orderBy`, `limit`, `onSnapshot`) with HakoDB operators (`== != > >= < <= match matchPrefix contains startsWith in not-in array-contains array-contains-any`).
 - `HakoConfig` exposes durability/encryption/workers; `NetSyncer` and `CloudSync` classes wrap the sync planes; `Transaction` and `WriteBatch` mirror the engine.
-- References use `{__ref__: "collection/id"}`; graph and vector ops (`createTraverseIndex`, `findPaths`, `createEdgeIndex`, `shortestPaths`, `createVectorIndex`, `findNear`) are on the client.
+- References use `{__ref__: "collection/id"}`; graph and vector ops (`createTraverseIndex`, `findPaths`, `createEdgeIndex`, `shortestPaths`, `createVectorIndex`, `findNear`) are on the client, with the filtered/projected variants (`hybridSearchFiltered`, `findNearScoredFiltered`, `subgraphProjected`) on the native layer.
 - Deletes are soft by default; `deleteEx(ref, force)` opts into a hard delete, and `restore` / `restoreAvailable` / `deleteQueue` / `sweepNow` wrap the retention surface on the client.
 
 ## Common mistakes
