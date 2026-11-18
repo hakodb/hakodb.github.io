@@ -10,6 +10,8 @@ Values are typed: `Null`, `Bool`, `Int(i64)`, `Float(f64)`, `String`, `Binary(by
 
 Your app *is* the database host. `Hako::open("./data", cfg)` memory-maps storage files and spawns background workers (indexing, compaction, WAL flusher) inside your process. There is no server process and no network port unless you enable sync.
 
+Two writable engines on one data dir corrupt interleaved WAL state that no bootstrap converges — plain `open` treats that as the caller's responsibility. Where a second writable open would be a bug (desktop apps, tools, tests), use `Hako::open_exclusive`: it holds an advisory OS lock on `<dir>/hako.lock` for the instance's lifetime and refuses a second holder loudly, cross-process and cross-instance in-process. The lock releases when the engine drops.
+
 On disk, `./data` holds segment files, the WAL, and index snapshots. Copying that directory while the database is [flushed and quiet](backup-recovery.md) is a valid backup.
 
 ## Reads and writes

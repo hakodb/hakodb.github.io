@@ -11,6 +11,30 @@ db.drop_vector_index("articles", "embedding")?; // definition + graph
 
 Vectors are stored as binary little-endian `f32` arrays in a regular field. Search walks an HNSW graph and rescores exactly — nearest first.
 
+## Filtered search
+
+Both search paths accept admission filters, so results are full-k within the filtered set (not "top-k, then drop the mismatches"):
+
+```rust,ignore
+// scored KNN with a distance cap: rows are (id, score, doc); score is
+// the raw distance (lower = better); None = no cap
+let hits = db.find_near_scored_filtered(
+    "articles", "embedding", &query_vec, 10,
+    None,                                   // max_distance cap
+    &[Filter::Eq("tenant".into(), "t2".into())], // [] = unfiltered
+)?;
+
+// hybrid text+vector: FTS + KNN sides fused with reciprocal-rank fusion;
+// filters apply BEFORE rank truncation on both sides
+let hits = db.hybrid_search_filtered(
+    "articles", "body", "database", "embedding", &query_vec,
+    10, 60,                               // k, rrf_k
+    &[Filter::Eq("tenant".into(), "t2".into())],
+)?;
+```
+
+The unfiltered `find_near` / `hybrid_search` variants remain; `find_near_scored` is `find_near_scored_filtered` without filters.
+
 Rules:
 
 - **Index before write.** Vectors written before the index exists are not searchable until re-indexed; create the index first.

@@ -45,6 +45,20 @@ db.drop_edge_index("rel")?; // later: _from/_to indexes + tracking
 
 Missing or non-numeric weights count 1.0; negatives clamp to 0. Without `via_edge`, the same call runs unweighted BFS.
 
+## Subgraph export
+
+`subgraph_json(collection, seed, spec)` exports the seed-scoped N-hop neighborhood as JSON (`{"nodes":[…],"edges":[…]}`, same node/edge shape as a graph export, scoped by seed; a missing seed returns an empty graph). Graph clients rarely need whole node docs, so the projected variant keeps only the fields you name:
+
+```rust,ignore
+// raw blobs (e.g. 384-dim embeddings) must not reach graph clients
+let json = db.subgraph_json_projected(
+    "docs", "a", &spec,
+    Some(&["name".into(), "kind".into()]),   // keep-list; None = full docs
+)?;
+```
+
+The walk, edge list, and JSON shape are unchanged; only the `doc` payload shrinks. Listed fields that do not exist stay absent — the same rule as query projections.
+
 ## The fail-loud rule
 
 Incoming walks need reverse state: a tracked anchor (backlinks) or a registered edge collection. If neither exists, the query **errors** instead of returning an empty list. An empty result therefore always means "no path", never "forgot the index". If you see the error, create the missing index first.

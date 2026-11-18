@@ -41,7 +41,7 @@ Notes:
 
 - `hakodb.dll` (64-bit) must sit next to the executable or on `PATH`; `native/` in the repo carries the current pair (`hakodb.dll` + `hakocluster.dll`).
 - Same rule as Go: every created handle is freed explicitly — `try/finally` is the pattern, not an option.
-- References, graph (`CreateTraverseIndex`/`FindPaths`, `CreateEdgeIndex`/`ShortestPaths`), and vector (`CreateVectorIndex`/`FindNear`) mirror the C ABI one-to-one; when in doubt, `HakoRaw.pas` shows the exact import signature.
+- References, graph (`CreateTraverseIndex`/`FindPaths`, `CreateEdgeIndex`/`ShortestPaths`, `Subgraph`/`SubgraphProjected`), and vector (`CreateVectorIndex`/`FindNear`, `HybridSearchFiltered`, `FindNearScoredFiltered`) mirror the C ABI one-to-one; when in doubt, `HakoRaw.pas` shows the exact import signature. `THako.CreateExclusive` refuses a second writable engine on one data dir; `EnsureIndexes` declares the boot schema in one idempotent call.
 - Deletes are soft by default (`Doc(...).Restore` undoes while the record is queued); `RestoreAvailable`, `DeleteQueue`, and `SweepNow` expose the retention surface.
 
 ## Common mistakes
