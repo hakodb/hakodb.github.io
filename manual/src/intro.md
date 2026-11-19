@@ -6,9 +6,8 @@ HakoDB is an embedded document database: a library you link into your process, n
 
 ## Five-minute quickstart
 
-```toml
-[dependencies]
-hakodb = "0.15"
+```sh
+cargo add hakodb
 ```
 
 ```rust,ignore
@@ -40,3 +39,4 @@ That is the whole deployment model: `open` a directory, read and write. No daemo
 - Want a feature tour? [CRUD](crud.md) → [Queries](queries.md) → [Indexes](indexes.md).
 - Need similarity or graph queries? [Vector search](vector.md), [Graph traversal](graph.md).
 - Shipping to production? [Durability](durability.md), [Backup and recovery](backup-recovery.md), [Errors](errors.md).
+- Looking for applications built on the engine? [HakoManager (alpha)](hakomanager.md), [HakoMemory](hakomemory.md).
