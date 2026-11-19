@@ -25,7 +25,7 @@ Two or more full apps on one network, one room key per environment. Seed with `h
 
 ## Multi-instance HTTP (cluster + socket)
 
-N backend processes on one box behind a balancer: `hakocluster` routes writes to one instance while `socket_sync` keeps replicas identical. See [Cluster](cluster.md). Across boxes, sync the backends with [cloud](sync-cloud.md) instead.
+N backend processes on one box behind a load balancer: `hakocluster` routes writes to one instance while `socket_sync` keeps replicas identical. See [Cluster](cluster.md). Across boxes, sync the backends with [cloud](sync-cloud.md) instead.
 
 ## Analytics reads
 

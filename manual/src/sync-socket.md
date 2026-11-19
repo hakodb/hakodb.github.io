@@ -1,6 +1,6 @@
 # Socket sync (one box)
 
-Feature: `socket-sync` (Unix only; a silent no-op on Windows so cross-platform builds stay green). Co-located instances on one machine hold byte-identical data over unix sockets — built for N processes behind a balancer with a single writer.
+Feature: `socket-sync` (Unix only; a silent no-op on Windows so cross-platform builds stay green). Co-located instances on one machine hold byte-identical data over unix sockets — built for N processes behind a load balancer with a single writer.
 
 ```rust,ignore
 use hakodb::socket_sync::SocketSync;
@@ -20,7 +20,7 @@ How it differs from mesh/cloud, deliberately:
 
 ## When to use it
 
-One box, several processes, one logical dataset: balancer workers, a writer + hot-standby readers, sidecar indexers. If the processes are on different machines, that is [mesh](sync-mesh.md) or [cloud](sync-cloud.md), not this.
+One box, several processes, one logical dataset: load-balanced workers, a writer + hot-standby readers, sidecar indexers. If the processes are on different machines, that is [mesh](sync-mesh.md) or [cloud](sync-cloud.md), not this.
 
 ## Common mistakes
 

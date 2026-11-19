@@ -50,12 +50,6 @@
 - [Real-product recipes](recipes.md)
 - [Operations](operations.md)
 - [Benchmarking](benchmarking.md)
-- [MCP server](mcp.md)
-- [Balancer](balancer.md)
-
-# Agent engine (hakoagent)
-
-- [Agent engine (hakoagent)](hakoagent.md)
 
 # Backend (hakobackend)
 - [Backend overview](backend-overview.md)
@@ -75,3 +69,8 @@
 - [Cloud server configuration](cloudserver-config.md)
 - [Cloud server console](cloudserver-console.md)
 - [Cloud server deploy](cloudserver-deploy.md)
+
+# Tools built on HakoDB
+
+- [HakoManager (alpha)](hakomanager.md)
+- [HakoMemory](hakomemory.md)
