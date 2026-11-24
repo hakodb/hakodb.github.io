@@ -58,6 +58,11 @@ decode with `HakoDoc::decode`, never persist or compare across
 versions. FFI: `hk_query_execute_raw` + result-set fns,
 `hk_cursor_walk` / `hk_cursor_walk_view` with C callbacks.
 
+For FFI query execution, `hk_query_execute_ex` is the canonical entry point;
+`hk_query_execute_to_handles` returns borrowed handles when you want to avoid
+JSON materialization. Legacy execute wrappers are advisory-deprecated but
+remain available. See the C ABI reference for the full lane table.
+
 ## Pagination
 
 Prefer keyset paging. `offset` exists, but it is a skip scan: the rows are

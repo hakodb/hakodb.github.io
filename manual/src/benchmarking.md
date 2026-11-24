@@ -7,8 +7,8 @@ The official harnesses live in `hakodb/hakobench`. Run them locally against a co
 `HAKODB_DIR` points at a core checkout (default `../hakodb`). `-I` takes the core's release directory because the core's build generates `hakodb.h` next to the binaries when built with the `header` feature (`cargo build --release --features header`; plain builds skip header generation).
 
 ```powershell
-$env:HAKODB_DIR = "C:\Dev\libs\hakodb"
-C:\Dev\msys64\ucrt64\bin\g++.exe -O2 -std=c++17 `
+$env:HAKODB_DIR = "<core-checkout>"
+g++.exe -O2 -std=c++17 `
   -I$env:HAKODB_DIR\target\release benchmark.cpp `
   -L$env:HAKODB_DIR\target\release -lhakodb -o benchmark.exe
 ```
@@ -20,9 +20,9 @@ MinGW links directly against `hakodb.dll`; no import-lib step is needed.
 `rustc` names the cdylib import library `hakodb.dll.lib` (not `hakodb.lib`). The repo includes `build-msvc.bat`, which assumes VS2022 Community and a core release build side by side:
 
 ```bat
-call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"
-cl /O2 /std:c++17 /EHsc /I C:\Dev\libs\hakodb\target\release benchmark.cpp ^
-  /link /LIBPATH:C:\Dev\libs\hakodb\target\release hakodb.dll.lib /OUT:benchmark-msvc.exe
+call "<VS install>\VC\Auxiliary\Build\vcvars64.bat"
+cl /O2 /std:c++17 /EHsc /I %HAKODB_DIR%\target\release benchmark.cpp ^
+  /link /LIBPATH:%HAKODB_DIR%\target\release hakodb.dll.lib /OUT:benchmark-msvc.exe
 ```
 
 At runtime `hakodb.dll` must sit next to the exe or on `PATH`. Release assets rename the import lib to `hakodb.lib`; either name links the same way.
@@ -30,7 +30,7 @@ At runtime `hakodb.dll` must sit next to the exe or on `PATH`. Release assets re
 ## Build (Linux)
 
 ```sh
-g++ -O2 -std=c++17 -I$HAKODB_DIR/include benchmark.cpp \
+g++ -O2 -std=c++17 -I$HAKODB_DIR/target/release benchmark.cpp \
   -L$HAKODB_DIR/target/release -Wl,-rpath,'$ORIGIN' -lhakodb -o benchmark
 ```
 
@@ -56,7 +56,7 @@ Use `--docs >= 1000` for meaningful results. Each run creates and destroys tempo
 |---|---|
 | `WPS (Sgl/Btc)` | Single writes/sec and batch writes/sec |
 | `RPS (Seq/Par)` | Sequential and multi-threaded point-reads/sec |
-| `STRESS (Get/Qry/Cmp)` | Mixed point-get, indexed-query, and composite-query throughput |
+| `STRESS (Get/Qry/Cmp/Reuse/Comp/Range)` | Point-get, indexed query, composite prefix query, pooled-handle query, composite-prefix + range, and range-bound query throughput |
 | `QPS (Off/Cur)` | Offset-pagination and cursor-pagination queries/sec |
 | `Agg QPS` | Aggregate queries/sec (`sum`) |
 | `Tx WPS` | Serializable transactions/sec |
@@ -67,6 +67,16 @@ Use `--docs >= 1000` for meaningful results. Each run creates and destroys tempo
 | `Size` | On-disk database size |
 
 Profiles: `Always`, `Interval`, `Manual`, `OnCommit`, `Enc_Comp` (encrypted + compressed), and `Gaming` (large documents, parallel workers). `Segment` is a diagnostic profile (0 inline budget, 1 MB rotation) that spills WAL-inlined docs into segments and reports the segment/WAL inventory plus a timed `compact()`.
+
+### Compare equal execution lanes
+
+The harness times the native query executor (`hk_query_execute_to_handles`),
+which returns handles without per-document JSON. An SDK call that serializes
+rows to JSON and parses them into language objects measures the SDK and the
+egress layer, not the same lane. When comparing harnesses, use the handle or
+view path on both sides, or explicitly label the JSON path as an integration
+cost. The same rule applies to the two JSON executors: they produce the same
+output but take different materialization paths.
 
 The `EXTENDED` section covers additional index families. Select them with `--index-groups` (default `std`):
 

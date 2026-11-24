@@ -4,6 +4,10 @@
 There are no joins and no SQL; a pipeline reads one collection at a time.
 Stages run in the order they are added.
 
+This is the engine pipeline API. A fluent query builder in an SDK, or shell
+command chaining in a CLI, is application-level composition rather than this
+feature; the canonical query executor does not change either pattern.
+
 ```rust
 let rows = db.run_pipeline(
     Pipeline::new("orders")
