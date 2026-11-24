@@ -19,6 +19,31 @@ Conventions every binding follows:
 - **Panics don't cross.** A bad call reports through `hk_last_error`; the process survives.
 - **Sync functions exist only in full builds.** Minimal (`--no-default-features`) DLLs lack the sync symbols — linking against them fails at load time, loudly, by design.
 
+## Query execution lanes
+
+`hk_query_execute_ex(engine, query, cancel)` is the canonical executor. Pass a
+null cancel handle for ordinary calls. Older execute entry points remain
+available as compatibility wrappers and are advisory-deprecated; bindings
+should move to the canonical symbol without removing the old declarations.
+
+The execute functions are not interchangeable — they differ in what they
+materialize:
+
+| Family | Result | Use when |
+|---|---|---|
+| `hk_query_execute_ex` | JSON array string from decoded documents | canonical API calls |
+| legacy `hk_query_execute` / `hk_query_execute_with_cancel` | same output, compatibility wrappers | advisory-deprecated; migrate to the canonical executor |
+| `hk_query_execute_json` | JSON array string emitted from pinned bytes | JSON egress without owned documents |
+| `hk_query_execute_to_handles` | borrowed `HK_Doc` handles | engine throughput; caller reads fields |
+| `hk_query_execute_raw` | pinned storage bytes, no decode | index-satisfied filters/ordering |
+| `hk_query_execute_aggregation` | JSON aggregate result | `count`/`sum`/`avg`/`min`/`max` |
+| `hk_query_explain` | plan report, no rows | tuning, never throughput |
+
+`hk_query_reset` reuses a handle. `hk_view_*` pulls typed fields from borrowed
+bytes. For the full decision table, see `docs/ffi-query-lanes.md` in the core
+repository. Benchmark comparisons must use the same lane: the native harness
+times `execute_to_handles`, not a JSON serializer.
+
 ## Open, boot schema, and filtered search
 
 Five symbols round out the write-path and search surface:
