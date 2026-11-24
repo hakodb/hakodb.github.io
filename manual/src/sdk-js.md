@@ -10,7 +10,7 @@ npm i @hakodb/client
 
 ```powershell
 # from a local core checkout (build it first: cargo build --release --features header)
-.\sync-native.ps1 -CoreDir C:\Dev\libs\hakodb
+.\sync-native.ps1 -CoreDir <core-checkout>
 # or from a core release (pass the tag you want)
 .\sync-native.ps1 -Tag <core-release-tag>
 ```

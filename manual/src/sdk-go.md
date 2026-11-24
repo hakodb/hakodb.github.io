@@ -6,7 +6,7 @@ Populate `third_party/` (canonical `hakodb.h` + platform binary) with the repo's
 
 ```powershell
 # from a local core checkout (build it first: cargo build --release --features header)
-.\sync-core.ps1 -CoreDir C:\Dev\libs\hakodb
+.\sync-core.ps1 -CoreDir <core-checkout>
 # or from a core release (pass the tag you want)
 .\sync-core.ps1 -Tag <core-release-tag>
 ```
