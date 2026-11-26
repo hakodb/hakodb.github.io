@@ -41,6 +41,7 @@ Notes:
 - `HakoConfig` exposes durability/encryption/workers; `NetSyncer` and `CloudSync` classes wrap the sync planes; `Transaction` and `WriteBatch` mirror the engine.
 - References use `{__ref__: "collection/id"}`. Graph and vector ops are on the collection; `findNear()` / `hybridSearch()` accept an optional `filters` array and use the canonical filtered lanes, while `findPathsFull()` / `shortestPathsFull()` are the canonical graph lanes. Edge indexes and tuned vector V2 parameters remain advanced APIs.
 - Canonical pairs: `effectiveConfig()` for introspection, `ensureIndexes()` / `dropIndexes()` for schema. `quiescenceStatus()`, `isIndexesReady()`, `getStats()`, granular `create*`/`drop*` index calls, `findPaths()`, `shortestPaths()`, and `Query.getJson()` are advisory-deprecated — they still work and emit a one-time warning.
+- Read lanes are not interchangeable. `get()` returns full `HakoDocData[]` and pays `JSON.parse`; `get({ mode: "json" })` is pinned-byte egress without JS objects; `select(...).get()` returns projected rows; `getViewRows(fields)` returns typed borrowed views with only the requested fields; `getRaw()` / `viewDoc()` are engine-only diagnostics whose checksums are count-only or partial. Use the document lane for application code and label diagnostic lanes explicitly in benchmarks.
 - Deletes are soft by default; `deleteEx(ref, force)` opts into a hard delete, and `restore` / `restoreAvailable` / `deleteQueue` / `sweepNow` wrap the retention surface on the client.
 
 ## Common mistakes
