@@ -24,6 +24,8 @@ db.drop_traverse_index("docs")?; // later: stop tracking incoming edges
 
 Each hit carries its depth from the start node. Depth is hard-capped at 32; visited sets keep cyclic graphs terminating.
 
+In the JS SDK, `findPathsFull()` and `shortestPathsFull()` (v4 FFI) are the canonical graph lanes; the older `findPaths()` / `shortestPaths()` aliases are advisory-deprecated. Rust callers keep using `find_paths` / `find_paths_with_spec` directly.
+
 ## Weighted shortest paths
 
 For costed graphs, store edges as documents with `_from`/`_to` references (plus any numeric weight field) and register the collection:

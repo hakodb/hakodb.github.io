@@ -44,23 +44,29 @@ bytes. For the full decision table, see `docs/ffi-query-lanes.md` in the core
 repository. Benchmark comparisons must use the same lane: the native harness
 times `execute_to_handles`, not a JSON serializer.
 
-## Open, boot schema, and filtered search
+## Open, boot schema, drops, and filtered search
 
-Five symbols round out the write-path and search surface:
+Seven symbols round out the write-path, schema, introspection, and search surface:
 
 | Function | Behavior |
 |---|---|
 | `hk_engine_open_exclusive(path)` | open holding an advisory data-dir lock; a second writable holder gets null + `hk_last_error()` (plain `hk_engine_open` keeps caller-owned semantics) |
-| `hk_engine_ensure_indexes(engine, schema_json)` | declare the whole boot schema (fts/vector/tracked) in one idempotent call; identical re-declaration is a no-op, a conflicting one fails loudly |
-| `hk_engine_hybrid_search_filtered(…, filters_json)` | hybrid text+vector search with admission filters before rank truncation; `null` = unfiltered |
-| `hk_engine_find_near_scored_filtered(…, max_distance, filters_json)` | scored KNN (raw distance, lower = better) with a distance cap (NaN/≤ 0 = none) and admission filters |
+| `hk_engine_ensure_indexes(engine, schema_json)` | declare the whole boot schema (secondary/composite/fts/vector/tracked) in one idempotent call; identical re-declaration is a no-op, a conflicting one fails loudly |
+| `hk_engine_drop_indexes(engine, collection)` | canonical schema reset: remove every index family for a collection in one call; documents are untouched |
+| `hk_engine_effective_config(engine)` | one JSON object with durability, commit trigger, index defs, quiescence (including `is_quiescent`), and stats |
+| `hk_engine_hybrid_search_filtered(…, filters_json)` | canonical hybrid text+vector search with admission filters before rank truncation; `null` = unfiltered |
+| `hk_engine_find_near_scored_filtered(…, max_distance, filters_json)` | canonical scored KNN (raw distance, lower = better) with a distance cap (NaN/≤ 0 = none) and admission filters |
 | `hk_engine_subgraph_json_projected(…, fields_json)` | seed-scoped subgraph export with a node-field keep-list; `null`/`[]` = full docs |
+
+Unfiltered search variants and graph/path FFI versions before V4 remain available but are advisory-deprecated; bind to the filtered and V4 symbols for new integrations.
 
 The headers are append-only, so older bindings keep compiling against newer libraries; calling a new symbol against an older runtime fails at load time, loudly.
 
 ## Index drops
 
-Each index create has a matching drop. All return `0` on success (including an absent target — drops are idempotent) and `-1` with `hk_last_error()` on failure, such as a read-only engine.
+`hk_engine_drop_indexes(engine, collection)` is the canonical reset: one call removes every index family declared for the collection. It returns `0` on success and is a no-op when there is nothing to drop. Document data is never touched.
+
+The family-specific drops remain for advanced callers. All return `0` on success (including an absent target — drops are idempotent) and `-1` with `hk_last_error()` on failure, such as a read-only engine.
 
 | Function | Removes |
 |---|---|
@@ -71,7 +77,7 @@ Each index create has a matching drop. All return `0` on success (including an a
 | `hk_engine_drop_traverse_index(engine, collection)` | incoming-edge tracking |
 | `hk_engine_drop_edge_index(engine, collection)` | `_from`/`_to` indexes + tracking |
 
-Composite ids come from `hk_engine_list_indexes`; an id owned by another collection is rejected instead of deleted. Document data is never touched.
+Composite ids come from `hk_engine_list_indexes`; an id owned by another collection is rejected instead of deleted. Prefer `drop_indexes` unless you need to remove one family while keeping the others.
 
 ## Cloud status redaction
 

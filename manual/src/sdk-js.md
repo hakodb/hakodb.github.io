@@ -39,7 +39,8 @@ Notes:
 - `open(path, options?)` loads `native/hakodb.dll` (shipped) or `options.libraryPath` / `HAKODB_LIB_PATH`. A failed open throws with `native.lastError()`.
 - Queries mirror Firestore spelling (`where`, `orderBy`, `limit`, `onSnapshot`) with HakoDB operators (`== != > >= < <= match matchPrefix contains startsWith in not-in array-contains array-contains-any`).
 - `HakoConfig` exposes durability/encryption/workers; `NetSyncer` and `CloudSync` classes wrap the sync planes; `Transaction` and `WriteBatch` mirror the engine.
-- References use `{__ref__: "collection/id"}`; graph and vector ops (`createTraverseIndex`, `findPaths`, `createEdgeIndex`, `shortestPaths`, `createVectorIndex`, `findNear`) are on the client, with the filtered/projected variants (`hybridSearchFiltered`, `findNearScoredFiltered`, `subgraphProjected`) on the native layer.
+- References use `{__ref__: "collection/id"}`. Graph and vector ops are on the collection; `findNear()` / `hybridSearch()` accept an optional `filters` array and use the canonical filtered lanes, while `findPathsFull()` / `shortestPathsFull()` are the canonical graph lanes. Edge indexes and tuned vector V2 parameters remain advanced APIs.
+- Canonical pairs: `effectiveConfig()` for introspection, `ensureIndexes()` / `dropIndexes()` for schema. `quiescenceStatus()`, `isIndexesReady()`, `getStats()`, granular `create*`/`drop*` index calls, `findPaths()`, `shortestPaths()`, and `Query.getJson()` are advisory-deprecated — they still work and emit a one-time warning.
 - Deletes are soft by default; `deleteEx(ref, force)` opts into a hard delete, and `restore` / `restoreAvailable` / `deleteQueue` / `sweepNow` wrap the retention surface on the client.
 
 ## Common mistakes
