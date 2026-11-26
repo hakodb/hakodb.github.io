@@ -33,7 +33,7 @@ let hits = db.hybrid_search_filtered(
 )?;
 ```
 
-The unfiltered `find_near` / `hybrid_search` variants remain; `find_near_scored` is `find_near_scored_filtered` without filters.
+The `_filtered` variants are canonical for new integrations; unfiltered `find_near` / `hybrid_search` and `find_near_scored` remain for compatibility. In the JS SDK, `findNear()` and `hybridSearch()` take an optional `filters` array and use the canonical filtered lanes automatically.
 
 Rules:
 

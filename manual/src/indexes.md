@@ -42,17 +42,20 @@ Re-running it with identical definitions is a cheap no-op that never wipes popul
 Every create has a matching drop. Drops remove the definition and its RAM state, leave document data untouched, and are idempotent: dropping an absent index returns `Ok`. Read-only engines refuse them (same `ReadOnly` error as writes).
 
 ```rust,ignore
+db.drop_indexes("users")?;                         // canonical: all families
+
+// Advanced: remove one family while keeping the others.
 db.drop_index("users", "tenant")?;                 // secondary
 db.drop_fts_index("articles", "body")?;            // full-text
 db.drop_vector_index("articles", "embedding")?;    // vector + HNSW graph
 
 let id = db.list_indexes(Some("users")).composite[0].id;
 db.drop_composite_index("users", id)?;             // composite
-
 db.drop_traverse_index("docs")?;                   // stop incoming tracking
 db.drop_edge_index("rel")?;                        // _from/_to + tracking
 ```
 
+- `ensure_indexes` / `drop_indexes` are the canonical boot-schema pair; the per-family calls remain for dynamic or one-off changes.
 - The composite id must belong to the named collection; a mismatch is `InvalidInput`, never a cross-collection delete.
 - Dropping a unique composite index releases its claim ledger immediately, so the old tuple can be inserted again.
 - `drop_edge_index` owns the `_from` and `_to` secondary indexes created by `create_edge_index`.
@@ -63,8 +66,8 @@ db.drop_edge_index("rel")?;                        // _from/_to + tracking
 
 Opening a database starts index recovery in the background. Separately, creating a secondary, full-text, vector, or **non-unique** composite index registers the definition and then backfills it on a background thread. While a collection's backfill is in flight, the planner treats that collection's index-backed plans as not ready and falls back to `FullCollection`. Two lanes have their own rules: the id-order `SortedKeys` slice stays available because it is index-independent, and vector lanes ignore pending writes (the executor live-filters deleted ids) but still wait for backfills to finish.
 
-- `is_indexes_ready()` covers open-time recovery only.
-- `quiescence_status()` reports `index_backfills`, `pending_index_ops`, and blob/maintenance work.
+- `effective_config()` now reports durability, index definitions, `indexes_ready`, a compact `quiescence` block (`is_quiescent`, `index_backfills`, `pending_index_ops`, blob/maintenance work), and `stats` in one call.
+- `is_indexes_ready()` covers open-time recovery only, and `quiescence_status()` reports the raw counters; both remain valid for Rust callers, while the JS SDK advises `effectiveConfig()` instead.
 - `await_quiescent(timeout)` waits for all of it, including the async index worker and backfills. Use it before benchmarks and tests.
 
 A unique composite index is the exception: its backfill is synchronous. Creation scans the collection, builds the claim ledger, and rejects the index if existing duplicates exist; the admission gate is active when the call returns.

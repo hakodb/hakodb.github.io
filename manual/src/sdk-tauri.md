@@ -52,7 +52,7 @@ Notes:
 - Watch subscriptions prebuild a filter plan once (`Hako::plan_for_watch`) and match per-event bytes with zero decode (`Hako::matches_watch`).
 - Sync planes are opt-in features on the gateway (`net-sync`, `cloud-sync`, `socket-sync`): enable what the app needs; the TS side calls the same sync ops.
 - `flushDatabase` / `listStorageKeys` cover the consumer ops (durability control, storage inspection).
-- Graph and vector ops are wired through (`createTraverseIndex`, `findPaths`, `createEdgeIndex`, `findNear`).
+- Graph and vector ops are wired through. Prefer `findPathsFull` / `shortestPathsFull` and the filtered `findNear` / `hybridSearch` lanes; the older aliases remain for compatibility.
 - Deletes are soft by default: the `delete` op takes `force: true` for a hard delete, batch delete items carry per-item `force`, and `restore` / `restore_available` / `delete_queue` / `sweep` ops cover the retention surface (records come back under the `records` key).
 
 ## Common mistakes
